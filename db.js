@@ -1,6 +1,6 @@
 /**
  * Database adapter — supports two backends:
- *   1. Turso / libSQL (cloud) — when TURSO_DATABASE_URL is set
+ *   1. Supabase / PostgreSQL (cloud) — when DATABASE_URL is set
  *   2. sql.js (local file) — fallback for local development
  */
 
@@ -10,30 +10,53 @@ const path = require('path');
 
 const DB_PATH = path.join(__dirname, 'data', 'portfolio.db');
 
-let db = null;        // sql.js instance (local mode)
-let client = null;    // @libsql/client instance (turso mode)
-let isTurso = false;
+let db = null;          // sql.js instance (local mode)
+let pool = null;        // pg Pool instance (supabase mode)
+let isSupabase = false;
 
-// ── Turso helpers ──────────────────────────────────────────────
+// ── Convert ? placeholders to $1,$2,... for PostgreSQL ─────────
 
-async function tursoRun(sql, params = []) {
-  const args = params.map(p => p === undefined ? null : p);
-  await client.execute({ sql, args });
+function toPg(sql, params) {
+  let i = 0;
+  const converted = sql.replace(/\?/g, () => `$${++i}`);
+  return { sql: converted, params };
 }
 
-async function tursoGet(sql, params = []) {
-  const args = params.map(p => p === undefined ? null : p);
-  const result = await client.execute({ sql, args });
-  return result.rows[0] || null;
+// ── PostgreSQL helpers (Supabase) ─────────────────────────────
+
+async function pgRun(sql, params = []) {
+  const { sql: pgSql, params: pgParams } = toPg(sql, params);
+  const client = await pool.connect();
+  try {
+    await client.query(pgSql, pgParams);
+  } finally {
+    client.release();
+  }
 }
 
-async function tursoAll(sql, params = []) {
-  const args = params.map(p => p === undefined ? null : p);
-  const result = await client.execute({ sql, args });
-  return result.rows || [];
+async function pgGet(sql, params = []) {
+  const { sql: pgSql, params: pgParams } = toPg(sql, params);
+  const client = await pool.connect();
+  try {
+    const result = await client.query(pgSql, pgParams);
+    return result.rows[0] || null;
+  } finally {
+    client.release();
+  }
 }
 
-// ── sql.js helpers ─────────────────────────────────────────────
+async function pgAll(sql, params = []) {
+  const { sql: pgSql, params: pgParams } = toPg(sql, params);
+  const client = await pool.connect();
+  try {
+    const result = await client.query(pgSql, pgParams);
+    return result.rows || [];
+  } finally {
+    client.release();
+  }
+}
+
+// ── sql.js helpers (local) ────────────────────────────────────
 
 function localRun(sql, params = []) {
   const safe = params.map(p => (p === undefined ? null : p));
@@ -77,20 +100,20 @@ function saveDb() {
   }
 }
 
-// ── Public API (async wrapper) ────────────────────────────────
+// ── Public API (async) ────────────────────────────────────────
 
 async function dbRun(sql, params = []) {
-  if (isTurso) return tursoRun(sql, params);
+  if (isSupabase) return pgRun(sql, params);
   return localRun(sql, params);
 }
 
 async function dbGet(sql, params = []) {
-  if (isTurso) return tursoGet(sql, params);
+  if (isSupabase) return pgGet(sql, params);
   return localGet(sql, params);
 }
 
 async function dbAll(sql, params = []) {
-  if (isTurso) return tursoAll(sql, params);
+  if (isSupabase) return pgAll(sql, params);
   return localAll(sql, params);
 }
 
@@ -101,27 +124,29 @@ function getDbSave() {
 // ── Initialization ─────────────────────────────────────────────
 
 async function initDatabase() {
-  const tursoUrl = process.env.TURSO_DATABASE_URL;
-  const tursoToken = process.env.TURSO_AUTH_TOKEN;
+  const databaseUrl = process.env.DATABASE_URL;
 
-  if (tursoUrl) {
-    // ── Turso / libSQL mode ──
-    const { createClient } = require('@libsql/client');
-    client = createClient({ url: tursoUrl, authToken: tursoToken });
-    isTurso = true;
-    console.log('✅ Connected to Turso database');
+  if (databaseUrl) {
+    // ── Supabase / PostgreSQL mode ──
+    const { Pool } = require('pg');
+    pool = new Pool({
+      connectionString: databaseUrl,
+      ssl: { rejectUnauthorized: false }
+    });
+    isSupabase = true;
+    console.log('✅ Connected to Supabase PostgreSQL');
 
     // Create tables if they don't exist
-    await client.executeMultiple(`
+    await pool.query(`
       CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         username TEXT UNIQUE NOT NULL,
         password TEXT NOT NULL,
         role TEXT DEFAULT 'admin',
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMPTZ DEFAULT NOW()
       );
       CREATE TABLE IF NOT EXISTS sections (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         section_key TEXT UNIQUE NOT NULL,
         title TEXT,
         subtitle TEXT,
@@ -129,11 +154,11 @@ async function initDatabase() {
         image_url TEXT,
         is_visible INTEGER DEFAULT 1,
         sort_order INTEGER DEFAULT 0,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
       );
       CREATE TABLE IF NOT EXISTS projects (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         title TEXT NOT NULL,
         description TEXT,
         technologies TEXT,
@@ -142,32 +167,32 @@ async function initDatabase() {
         is_featured INTEGER DEFAULT 0,
         is_visible INTEGER DEFAULT 1,
         sort_order INTEGER DEFAULT 0,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
       );
       CREATE TABLE IF NOT EXISTS skills (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         name TEXT NOT NULL,
         category TEXT DEFAULT 'technical',
         proficiency INTEGER DEFAULT 50,
         icon TEXT,
         is_visible INTEGER DEFAULT 1,
         sort_order INTEGER DEFAULT 0,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
       );
       CREATE TABLE IF NOT EXISTS services (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         title TEXT NOT NULL,
         description TEXT,
         icon TEXT,
         is_visible INTEGER DEFAULT 1,
         sort_order INTEGER DEFAULT 0,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
       );
       CREATE TABLE IF NOT EXISTS testimonials (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         client_name TEXT NOT NULL,
         client_title TEXT,
         client_image TEXT,
@@ -175,51 +200,51 @@ async function initDatabase() {
         rating INTEGER DEFAULT 5,
         is_visible INTEGER DEFAULT 1,
         sort_order INTEGER DEFAULT 0,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
       );
       CREATE TABLE IF NOT EXISTS contacts (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         name TEXT NOT NULL,
         email TEXT NOT NULL,
         phone TEXT,
         subject TEXT,
         message TEXT NOT NULL,
         is_read INTEGER DEFAULT 0,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMPTZ DEFAULT NOW()
       );
       CREATE TABLE IF NOT EXISTS style_settings (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         setting_key TEXT UNIQUE NOT NULL,
         setting_value TEXT,
         setting_type TEXT DEFAULT 'color',
         category TEXT DEFAULT 'colors',
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
       );
       CREATE TABLE IF NOT EXISTS site_config (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         config_key TEXT UNIQUE NOT NULL,
         config_value TEXT,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
       );
       CREATE TABLE IF NOT EXISTS analytics (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         event_type TEXT NOT NULL,
         page_url TEXT,
         ip_address TEXT,
         user_agent TEXT,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMPTZ DEFAULT NOW()
       );
     `);
 
     // Seed default admin user if not exists
     const bcrypt = require('bcryptjs');
-    const existingUser = await tursoGet('SELECT id FROM users WHERE username = ?', ['admin']);
+    const existingUser = await pgGet('SELECT id FROM users WHERE username = $1', ['admin']);
     if (!existingUser) {
       const hash = bcrypt.hashSync('admin123', 10);
-      await tursoRun('INSERT INTO users (username, password, role) VALUES (?, ?, ?)', ['admin', hash, 'admin']);
+      await pgRun('INSERT INTO users (username, password, role) VALUES ($1, $2, $3)', ['admin', hash, 'admin']);
       console.log('✅ Default admin user created (admin / admin123)');
     }
 
@@ -241,20 +266,13 @@ async function initDatabase() {
     ]);
 
     async function ensureConfig(key, value) {
-      const existing = await tursoGet('SELECT config_key FROM site_config WHERE config_key = ?', [key]);
+      const existing = await pgGet('SELECT config_key FROM site_config WHERE config_key = $1', [key]);
       if (!existing) {
-        await tursoRun('INSERT INTO site_config (config_key, config_value) VALUES (?, ?)', [key, value]);
+        await pgRun('INSERT INTO site_config (config_key, config_value) VALUES ($1, $2)', [key, value]);
       }
     }
     await ensureConfig('education_items', defaultEducation);
     await ensureConfig('core_competencies', defaultCompetencies);
-
-    // Add sort_order column to testimonials if missing (migration)
-    try {
-      await tursoRun('ALTER TABLE testimonials ADD COLUMN sort_order INTEGER DEFAULT 0');
-    } catch (e) {
-      // Column already exists — ignore
-    }
 
   } else {
     // ── Local sql.js mode ──
