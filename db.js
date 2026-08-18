@@ -10,11 +10,11 @@ const path = require('path');
 
 const DB_PATH = path.join(__dirname, 'data', 'portfolio.db');
 
-let db = null;          // sql.js instance (local mode)
-let pool = null;        // pg Pool instance (supabase mode)
+let db = null;
+let pool = null;
 let isSupabase = false;
 
-// ── Convert ? placeholders to $1,$2,... for PostgreSQL ─────────
+// ── Convert ? placeholders to $1,$2 for PostgreSQL ─────────────
 
 function toPg(sql, params) {
   let i = 0;
@@ -22,7 +22,7 @@ function toPg(sql, params) {
   return { sql: converted, params };
 }
 
-// ── PostgreSQL helpers (Supabase) ─────────────────────────────
+// ── PostgreSQL helpers ─────────────────────────────────────────
 
 async function pgRun(sql, params = []) {
   const { sql: pgSql, params: pgParams } = toPg(sql, params);
@@ -100,7 +100,7 @@ function saveDb() {
   }
 }
 
-// ── Public API (async) ────────────────────────────────────────
+// ── Public API ────────────────────────────────────────────────
 
 async function dbRun(sql, params = []) {
   if (isSupabase) return pgRun(sql, params);
@@ -131,12 +131,24 @@ async function initDatabase() {
     const { Pool } = require('pg');
     pool = new Pool({
       connectionString: databaseUrl,
-      ssl: { rejectUnauthorized: false }
+      ssl: { rejectUnauthorized: false },
+      max: 3,
+      idleTimeoutMillis: 10000,
+      connectionTimeoutMillis: 10000
     });
-    isSupabase = true;
-    console.log('✅ Connected to Supabase PostgreSQL');
 
-    // Create tables if they don't exist
+    // Test the connection
+    const client = await pool.connect();
+    try {
+      await client.query('SELECT NOW()');
+      console.log('✅ Connected to Supabase PostgreSQL');
+    } finally {
+      client.release();
+    }
+
+    isSupabase = true;
+
+    // Create tables
     await pool.query(`
       CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
@@ -239,23 +251,29 @@ async function initDatabase() {
       );
     `);
 
-    // Seed default admin user if not exists
+    // Seed admin user
     const bcrypt = require('bcryptjs');
     const existingUser = await pgGet('SELECT id FROM users WHERE username = $1', ['admin']);
     if (!existingUser) {
       const hash = bcrypt.hashSync('admin123', 10);
       await pgRun('INSERT INTO users (username, password, role) VALUES ($1, $2, $3)', ['admin', hash, 'admin']);
-      console.log('✅ Default admin user created (admin / admin123)');
+      console.log('✅ Default admin created (admin / admin123)');
     }
 
-    // Seed default config
-    const defaultEducation = JSON.stringify([
-      { title: 'Bachelor of Arts (Education) in Islamic Studies', institution: 'University of Ilorin', description: 'Studied Islamic Studies Education with a focus on Islamic scholarship, educational methodology, teaching practices, and the effective transmission of Islamic knowledge.' },
-      { title: "I'dādiyyah & Thānawiyyah Certificates", institution: "Dārul-'Ulūm Isalekoto", description: "Completed structured studies in Islamic sciences and Arabic language at both the I'dādiyyah and Thānawiyyah levels." },
-      { title: "Qur'anic Memorization & Tajwid", institution: "Dārul-'Ulūm Isalekoto", description: "Completed Qur'anic memorization alongside structured Tajwid training." },
-      { title: 'Desktop Publishing & Programming', institution: 'Self-taught', description: 'Developed practical skills in desktop publishing and programming through self-directed study.' }
-    ]);
-    const defaultCompetencies = JSON.stringify([
+    // Seed config
+    async function ensureConfig(key, value) {
+      const existing = await pgGet('SELECT config_key FROM site_config WHERE config_key = $1', [key]);
+      if (!existing) {
+        await pgRun('INSERT INTO site_config (config_key, config_value) VALUES ($1, $2)', [key, value]);
+      }
+    }
+    await ensureConfig('education_items', JSON.stringify([
+      { title: 'Bachelor of Arts (Education) in Islamic Studies', institution: 'University of Ilorin', description: 'Studied Islamic Studies Education.' },
+      { title: "I'dādiyyah & Thānawiyyah Certificates", institution: "Dārul-'Ulūm Isalekoto", description: "Completed structured studies in Islamic sciences." },
+      { title: "Qur'anic Memorization & Tajwid", institution: "Dārul-'Ulūm Isalekoto", description: "Completed Qur'anic memorization alongside Tajwid training." },
+      { title: 'Desktop Publishing & Programming', institution: 'Self-taught', description: 'Developed practical skills in desktop publishing and programming.' }
+    ]));
+    await ensureConfig('core_competencies', JSON.stringify([
       { name: 'Islamic Studies', icon: 'mosque' },
       { name: "Qur'anic Memorization", icon: 'menu_book' },
       { name: 'Tajwid', icon: 'record_voice_over' },
@@ -263,16 +281,7 @@ async function initDatabase() {
       { name: 'EdTech', icon: 'school' },
       { name: 'UI/UX Design', icon: 'design_services' },
       { name: 'Digital Learning', icon: 'devices' }
-    ]);
-
-    async function ensureConfig(key, value) {
-      const existing = await pgGet('SELECT config_key FROM site_config WHERE config_key = $1', [key]);
-      if (!existing) {
-        await pgRun('INSERT INTO site_config (config_key, config_value) VALUES ($1, $2)', [key, value]);
-      }
-    }
-    await ensureConfig('education_items', defaultEducation);
-    await ensureConfig('core_competencies', defaultCompetencies);
+    ]));
 
   } else {
     // ── Local sql.js mode ──
@@ -293,7 +302,6 @@ async function initDatabase() {
       db = new SQL.Database(fileBuffer);
     }
 
-    // Migrations
     try {
       const res = db.exec("PRAGMA table_info(testimonials)");
       const cols = res.length ? res[0].values : [];
@@ -303,14 +311,19 @@ async function initDatabase() {
       }
     } catch (e) { /* ignore */ }
 
-    // Seed default config
-    const defaultEducation = JSON.stringify([
-      { title: 'Bachelor of Arts (Education) in Islamic Studies', institution: 'University of Ilorin', description: 'Studied Islamic Studies Education with a focus on Islamic scholarship, educational methodology, teaching practices, and the effective transmission of Islamic knowledge.' },
-      { title: "I'dādiyyah & Thānawiyyah Certificates", institution: "Dārul-'Ulūm Isalekoto", description: "Completed structured studies in Islamic sciences and Arabic language at both the I'dādiyyah and Thānawiyyah levels." },
-      { title: "Qur'anic Memorization & Tajwid", institution: "Dārul-'Ulūm Isalekoto", description: "Completed Qur'anic memorization alongside structured Tajwid training." },
-      { title: 'Desktop Publishing & Programming', institution: 'Self-taught', description: 'Developed practical skills in desktop publishing and programming through self-directed study.' }
-    ]);
-    const defaultCompetencies = JSON.stringify([
+    function ensureConfig(key, value) {
+      const existing = localGet('SELECT config_key FROM site_config WHERE config_key = ?', [key]);
+      if (!existing) {
+        localRun('INSERT INTO site_config (config_key, config_value) VALUES (?, ?)', [key, value]);
+      }
+    }
+    ensureConfig('education_items', JSON.stringify([
+      { title: 'Bachelor of Arts (Education) in Islamic Studies', institution: 'University of Ilorin', description: 'Studied Islamic Studies Education.' },
+      { title: "I'dādiyyah & Thānawiyyah Certificates", institution: "Dārul-'Ulūm Isalekoto", description: "Completed structured studies in Islamic sciences." },
+      { title: "Qur'anic Memorization & Tajwid", institution: "Dārul-'Ulūm Isalekoto", description: "Completed Qur'anic memorization alongside Tajwid training." },
+      { title: 'Desktop Publishing & Programming', institution: 'Self-taught', description: 'Developed practical skills in desktop publishing and programming.' }
+    ]));
+    ensureConfig('core_competencies', JSON.stringify([
       { name: 'Islamic Studies', icon: 'mosque' },
       { name: "Qur'anic Memorization", icon: 'menu_book' },
       { name: 'Tajwid', icon: 'record_voice_over' },
@@ -318,16 +331,7 @@ async function initDatabase() {
       { name: 'EdTech', icon: 'school' },
       { name: 'UI/UX Design', icon: 'design_services' },
       { name: 'Digital Learning', icon: 'devices' }
-    ]);
-
-    function ensureConfig(key, value) {
-      const existing = localGet('SELECT config_key FROM site_config WHERE config_key = ?', [key]);
-      if (!existing) {
-        localRun('INSERT INTO site_config (config_key, config_value) VALUES (?, ?)', [key, value]);
-      }
-    }
-    ensureConfig('education_items', defaultEducation);
-    ensureConfig('core_competencies', defaultCompetencies);
+    ]));
 
     console.log('✅ Local SQLite database ready');
   }
