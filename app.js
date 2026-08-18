@@ -47,6 +47,7 @@ function createApp() {
     '/projects': 'projects.html', '/projects.html': 'projects.html',
     '/admin': 'admin.html', '/admin.html': 'admin.html'
   };
+  const PAGES_DIR = path.join(__dirname, 'pages');
 
   app.use((req, res, next) => {
     const file = PAGE_FILES[req.path];
@@ -66,7 +67,7 @@ function createApp() {
       ]).then(([stylesRows, configRows]) => {
         stylesRows.forEach(s => { styles[s.setting_key] = s.setting_value; });
         configRows.forEach(c => { config[c.config_key] = c.config_value; });
-        let html = fs.readFileSync(path.join(__dirname, 'public', file), 'utf8');
+        let html = fs.readFileSync(path.join(PAGES_DIR, file), 'utf8');
         const data = JSON.stringify({ styles, config }).replace(/</g, '\\u003c');
         const tag = '<script>window.__INITIAL_DATA__ = ' + data + ';</script>';
         html = html.replace('<script src="/editor.js"></script>', tag + '\n    <script src="/editor.js"></script>');
