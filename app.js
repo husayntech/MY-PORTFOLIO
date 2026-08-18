@@ -5,125 +5,12 @@ const compression = require('compression');
 const morgan = require('morgan');
 const cors = require('cors');
 const path = require('path');
-const initSqlJs = require('sql.js');
 const bcrypt = require('bcryptjs');
 const fs = require('fs');
 const multer = require('multer');
+const { initDatabase, dbRun, dbGet, dbAll, getDbSave } = require('./db');
 
 require('dotenv').config();
-
-const DB_PATH = path.join(__dirname, 'data', 'portfolio.db');
-
-let db;
-let appReady = false;
-
-// ============ DATABASE HELPERS ============
-
-function dbRun(sql, params = []) {
-  const safe = params.map(p => (p === undefined ? null : p));
-  db.run(sql, safe);
-  saveDb();
-}
-
-function dbGet(sql, params = []) {
-  const stmt = db.prepare(sql);
-  stmt.bind(params);
-  if (stmt.step()) {
-    const row = stmt.getAsObject();
-    stmt.free();
-    return row;
-  }
-  stmt.free();
-  return null;
-}
-
-function dbAll(sql, params = []) {
-  const results = [];
-  const stmt = db.prepare(sql);
-  stmt.bind(params);
-  while (stmt.step()) {
-    results.push(stmt.getAsObject());
-  }
-  stmt.free();
-  return results;
-}
-
-function saveDb() {
-  try {
-    const data = db.export();
-    const buffer = Buffer.from(data);
-    if (!fs.existsSync(path.join(__dirname, 'data'))) {
-      fs.mkdirSync(path.join(__dirname, 'data'), { recursive: true });
-    }
-    fs.writeFileSync(DB_PATH, buffer);
-  } catch (err) {
-    console.error('Error saving database:', err);
-  }
-}
-
-function ensureColumn(table, column, ddl) {
-  try {
-    const res = db.exec(`PRAGMA table_info(${table})`);
-    const cols = res.length ? res[0].values : [];
-    if (!cols.some(row => row[1] === column)) {
-      db.run(`ALTER TABLE ${table} ADD COLUMN ${ddl}`);
-      saveDb();
-      console.log(`✅ Migration: added column ${table}.${column}`);
-    }
-  } catch (err) {
-    console.error(`Migration failed for ${table}.${column}:`, err);
-  }
-}
-
-// ============ INITIALIZE APP ============
-
-async function initApp() {
-  if (appReady) return;
-
-  const SQL = await initSqlJs();
-
-  if (fs.existsSync(DB_PATH)) {
-    const fileBuffer = fs.readFileSync(DB_PATH);
-    db = new SQL.Database(fileBuffer);
-    console.log('✅ Database loaded');
-  } else {
-    console.log('📁 Creating new database...');
-    db = new SQL.Database();
-    if (!fs.existsSync(path.join(__dirname, 'data'))) {
-      fs.mkdirSync(path.join(__dirname, 'data'), { recursive: true });
-    }
-    require('./scripts/init-db.js');
-    const fileBuffer = fs.readFileSync(DB_PATH);
-    db = new SQL.Database(fileBuffer);
-  }
-
-  // Migrations
-  ensureColumn('testimonials', 'sort_order', 'sort_order INTEGER DEFAULT 0');
-
-  function ensureConfigDefault(key, value) {
-    const existing = dbGet('SELECT config_key FROM site_config WHERE config_key = ?', [key]);
-    if (!existing) {
-      dbRun('INSERT INTO site_config (config_key, config_value) VALUES (?, ?)', [key, value]);
-    }
-  }
-  ensureConfigDefault('education_items', JSON.stringify([
-    { title: 'Bachelor of Arts (Education) in Islamic Studies', institution: 'University of Ilorin', description: 'Studied Islamic Studies Education with a focus on Islamic scholarship, educational methodology, teaching practices, and the effective transmission of Islamic knowledge. Developed a strong foundation in Islamic sciences alongside modern approaches to education.' },
-    { title: "I'dādiyyah & Thānawiyyah Certificates", institution: "Dārul-'Ulūm Isalekoto", description: "Completed structured studies in Islamic sciences and Arabic language at both the I'dādiyyah and Thānawiyyah levels, developing a foundation in Arabic, Islamic jurisprudence, theology, and classical Islamic disciplines." },
-    { title: "Qur'anic Memorization & Tajwid", institution: "Dārul-'Ulūm Isalekoto", description: "Completed Qur'anic memorization alongside structured Tajwid training — mastering the rules of recitation, articulation points, and the qualities of letters — building a strong foundation in accurate recitation with continued review to preserve it." },
-    { title: 'Desktop Publishing & Programming', institution: 'Self-taught', description: 'Developed practical skills in desktop publishing — layout design, typography, and print-ready document production — alongside programming and modern web technologies through self-directed study, applied to creating educational materials and digital platforms.' }
-  ]));
-  ensureConfigDefault('core_competencies', JSON.stringify([
-    { name: 'Islamic Studies', icon: 'mosque' },
-    { name: "Qur'anic Memorization", icon: 'menu_book' },
-    { name: 'Tajwid', icon: 'record_voice_over' },
-    { name: 'Arabic Language', icon: 'translate' },
-    { name: 'EdTech', icon: 'school' },
-    { name: 'UI/UX Design', icon: 'design_services' },
-    { name: 'Digital Learning', icon: 'devices' }
-  ]));
-
-  appReady = true;
-}
 
 // ============ CREATE EXPRESS APP ============
 
@@ -164,21 +51,31 @@ function createApp() {
   app.use((req, res, next) => {
     const file = PAGE_FILES[req.path];
     if (!file || req.method !== 'GET') return next();
+    // Fire-and-forget analytics (don't block page render)
     if (req.path === '/') {
       dbRun("INSERT INTO analytics (event_type, page_url, ip_address, user_agent) VALUES ('page_view', '/', ?, ?)",
-        [req.ip, req.get('user-agent')]);
+        [req.ip, req.get('user-agent')]).catch(() => {});
     }
     try {
       const styles = {};
-      dbAll('SELECT * FROM style_settings').forEach(s => { styles[s.setting_key] = s.setting_value; });
       const config = {};
-      dbAll('SELECT * FROM site_config').forEach(c => { config[c.config_key] = c.config_value; });
-      let html = fs.readFileSync(path.join(__dirname, 'public', file), 'utf8');
-      const data = JSON.stringify({ styles, config }).replace(/</g, '\\u003c');
-      const tag = '<script>window.__INITIAL_DATA__ = ' + data + ';</script>';
-      html = html.replace('<script src="/editor.js"></script>', tag + '\n    <script src="/editor.js"></script>');
-      res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
-      res.type('html').send(html);
+      // Use sync-safe approach: read from DB then render
+      Promise.all([
+        dbAll('SELECT * FROM style_settings'),
+        dbAll('SELECT * FROM site_config')
+      ]).then(([stylesRows, configRows]) => {
+        stylesRows.forEach(s => { styles[s.setting_key] = s.setting_value; });
+        configRows.forEach(c => { config[c.config_key] = c.config_value; });
+        let html = fs.readFileSync(path.join(__dirname, 'public', file), 'utf8');
+        const data = JSON.stringify({ styles, config }).replace(/</g, '\\u003c');
+        const tag = '<script>window.__INITIAL_DATA__ = ' + data + ';</script>';
+        html = html.replace('<script src="/editor.js"></script>', tag + '\n    <script src="/editor.js"></script>');
+        res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+        res.type('html').send(html);
+      }).catch(err => {
+        console.error('Error rendering page:', err);
+        res.status(500).json({ error: 'Failed to render page' });
+      });
     } catch (err) {
       console.error('Error rendering page:', err);
       res.status(500).json({ error: 'Failed to render page' });
@@ -204,16 +101,21 @@ function createApp() {
     res.status(401).json({ error: 'Unauthorized' });
   };
 
-  app.post('/api/auth/login', (req, res) => {
-    const { username, password } = req.body;
-    const user = dbGet('SELECT * FROM users WHERE username = ?', [username]);
-    if (!user || !bcrypt.compareSync(password, user.password)) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+  app.post('/api/auth/login', async (req, res) => {
+    try {
+      const { username, password } = req.body;
+      const user = await dbGet('SELECT * FROM users WHERE username = ?', [username]);
+      if (!user || !bcrypt.compareSync(password, user.password)) {
+        return res.status(401).json({ error: 'Invalid credentials' });
+      }
+      req.session.userId = user.id;
+      req.session.username = user.username;
+      req.session.role = user.role;
+      res.json({ success: true, user: { id: user.id, username: user.username, role: user.role } });
+    } catch (err) {
+      console.error('Login error:', err);
+      res.status(500).json({ error: 'Internal server error' });
     }
-    req.session.userId = user.id;
-    req.session.username = user.username;
-    req.session.role = user.role;
-    res.json({ success: true, user: { id: user.id, username: user.username, role: user.role } });
   });
 
   app.post('/api/auth/logout', (req, res) => {
@@ -230,261 +132,321 @@ function createApp() {
   });
 
   // ============ SECTIONS API ============
-  app.get('/api/sections', (req, res) => {
-    res.json(dbAll('SELECT * FROM sections WHERE is_visible = 1 ORDER BY sort_order'));
+  app.get('/api/sections', async (req, res) => {
+    try {
+      res.json(await dbAll('SELECT * FROM sections WHERE is_visible = 1 ORDER BY sort_order'));
+    } catch (err) { res.status(500).json({ error: err.message }); }
   });
 
-  app.get('/api/sections/:key', (req, res) => {
-    const section = dbGet('SELECT * FROM sections WHERE section_key = ?', [req.params.key]);
-    if (!section) return res.status(404).json({ error: 'Section not found' });
-    res.json(section);
+  app.get('/api/sections/:key', async (req, res) => {
+    try {
+      const section = await dbGet('SELECT * FROM sections WHERE section_key = ?', [req.params.key]);
+      if (!section) return res.status(404).json({ error: 'Section not found' });
+      res.json(section);
+    } catch (err) { res.status(500).json({ error: err.message }); }
   });
 
-  app.put('/api/sections/:key', requireAuth, (req, res) => {
-    const { title, subtitle, content, image_url, is_visible, sort_order } = req.body;
-    dbRun(`UPDATE sections SET title = COALESCE(?, title), subtitle = COALESCE(?, subtitle), content = COALESCE(?, content), image_url = COALESCE(?, image_url), is_visible = COALESCE(?, is_visible), sort_order = COALESCE(?, sort_order), updated_at = datetime('now') WHERE section_key = ?`,
-      [title, subtitle, content, image_url, is_visible, sort_order, req.params.key]);
-    res.json({ success: true });
+  app.put('/api/sections/:key', requireAuth, async (req, res) => {
+    try {
+      const { title, subtitle, content, image_url, is_visible, sort_order } = req.body;
+      await dbRun(`UPDATE sections SET title = COALESCE(?, title), subtitle = COALESCE(?, subtitle), content = COALESCE(?, content), image_url = COALESCE(?, image_url), is_visible = COALESCE(?, is_visible), sort_order = COALESCE(?, sort_order), updated_at = datetime('now') WHERE section_key = ?`,
+        [title, subtitle, content, image_url, is_visible, sort_order, req.params.key]);
+      res.json({ success: true });
+    } catch (err) { res.status(500).json({ error: err.message }); }
   });
 
   // ============ PROJECTS API ============
-  app.get('/api/projects', (req, res) => {
-    res.json(dbAll('SELECT * FROM projects WHERE is_visible = 1 ORDER BY sort_order'));
+  app.get('/api/projects', async (req, res) => {
+    try {
+      res.json(await dbAll('SELECT * FROM projects WHERE is_visible = 1 ORDER BY sort_order'));
+    } catch (err) { res.status(500).json({ error: err.message }); }
   });
 
-  app.get('/api/projects/:id', (req, res) => {
-    const project = dbGet('SELECT * FROM projects WHERE id = ?', [parseInt(req.params.id)]);
-    if (!project) return res.status(404).json({ error: 'Project not found' });
-    res.json(project);
+  app.get('/api/projects/:id', async (req, res) => {
+    try {
+      const project = await dbGet('SELECT * FROM projects WHERE id = ?', [parseInt(req.params.id)]);
+      if (!project) return res.status(404).json({ error: 'Project not found' });
+      res.json(project);
+    } catch (err) { res.status(500).json({ error: err.message }); }
   });
 
-  app.post('/api/projects', requireAuth, (req, res) => {
-    const { title, description, technologies, image_url, project_url, is_featured, sort_order } = req.body;
-    let finalOrder = sort_order;
-    if (finalOrder === undefined || finalOrder === null) {
-      const maxRow = dbGet('SELECT COALESCE(MAX(sort_order), 0) as m FROM projects');
-      finalOrder = (maxRow?.m || 0) + 1;
-    }
-    dbRun(`INSERT INTO projects (title, description, technologies, image_url, project_url, is_featured, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [title, description, technologies, image_url, project_url, is_featured || 0, finalOrder]);
-    const lastId = dbGet('SELECT last_insert_rowid() as id');
-    res.json({ success: true, id: lastId?.id });
+  app.post('/api/projects', requireAuth, async (req, res) => {
+    try {
+      const { title, description, technologies, image_url, project_url, is_featured, sort_order } = req.body;
+      let finalOrder = sort_order;
+      if (finalOrder === undefined || finalOrder === null) {
+        const maxRow = await dbGet('SELECT COALESCE(MAX(sort_order), 0) as m FROM projects');
+        finalOrder = (maxRow?.m || 0) + 1;
+      }
+      await dbRun(`INSERT INTO projects (title, description, technologies, image_url, project_url, is_featured, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [title, description, technologies, image_url, project_url, is_featured || 0, finalOrder]);
+      const lastId = await dbGet('SELECT last_insert_rowid() as id');
+      res.json({ success: true, id: lastId?.id });
+    } catch (err) { res.status(500).json({ error: err.message }); }
   });
 
-  app.put('/api/projects/:id', requireAuth, (req, res) => {
-    const { title, description, technologies, image_url, project_url, is_featured, is_visible, sort_order } = req.body;
-    dbRun(`UPDATE projects SET title = COALESCE(?, title), description = COALESCE(?, description), technologies = COALESCE(?, technologies), image_url = COALESCE(?, image_url), project_url = COALESCE(?, project_url), is_featured = COALESCE(?, is_featured), is_visible = COALESCE(?, is_visible), sort_order = COALESCE(?, sort_order), updated_at = datetime('now') WHERE id = ?`,
-      [title, description, technologies, image_url, project_url, is_featured, is_visible, sort_order, parseInt(req.params.id)]);
-    res.json({ success: true });
+  app.put('/api/projects/:id', requireAuth, async (req, res) => {
+    try {
+      const { title, description, technologies, image_url, project_url, is_featured, is_visible, sort_order } = req.body;
+      await dbRun(`UPDATE projects SET title = COALESCE(?, title), description = COALESCE(?, description), technologies = COALESCE(?, technologies), image_url = COALESCE(?, image_url), project_url = COALESCE(?, project_url), is_featured = COALESCE(?, is_featured), is_visible = COALESCE(?, is_visible), sort_order = COALESCE(?, sort_order), updated_at = datetime('now') WHERE id = ?`,
+        [title, description, technologies, image_url, project_url, is_featured, is_visible, sort_order, parseInt(req.params.id)]);
+      res.json({ success: true });
+    } catch (err) { res.status(500).json({ error: err.message }); }
   });
 
-  app.delete('/api/projects/:id', requireAuth, (req, res) => {
-    dbRun('DELETE FROM projects WHERE id = ?', [parseInt(req.params.id)]);
-    res.json({ success: true });
+  app.delete('/api/projects/:id', requireAuth, async (req, res) => {
+    try {
+      await dbRun('DELETE FROM projects WHERE id = ?', [parseInt(req.params.id)]);
+      res.json({ success: true });
+    } catch (err) { res.status(500).json({ error: err.message }); }
   });
 
   // ============ SKILLS API ============
-  app.get('/api/skills', (req, res) => {
-    const { category } = req.query;
-    if (category) {
-      res.json(dbAll('SELECT * FROM skills WHERE category = ? AND is_visible = 1 ORDER BY sort_order', [category]));
-    } else {
-      res.json(dbAll('SELECT * FROM skills WHERE is_visible = 1 ORDER BY sort_order'));
-    }
+  app.get('/api/skills', async (req, res) => {
+    try {
+      const { category } = req.query;
+      if (category) {
+        res.json(await dbAll('SELECT * FROM skills WHERE category = ? AND is_visible = 1 ORDER BY sort_order', [category]));
+      } else {
+        res.json(await dbAll('SELECT * FROM skills WHERE is_visible = 1 ORDER BY sort_order'));
+      }
+    } catch (err) { res.status(500).json({ error: err.message }); }
   });
 
-  app.post('/api/skills', requireAuth, (req, res) => {
-    const { name, category, proficiency, icon, sort_order } = req.body;
-    let finalOrder = sort_order;
-    if (finalOrder === undefined || finalOrder === null) {
-      const maxRow = dbGet('SELECT COALESCE(MAX(sort_order), 0) as m FROM skills WHERE category = ?', [category || 'technical']);
-      finalOrder = (maxRow?.m || 0) + 1;
-    }
-    dbRun('INSERT INTO skills (name, category, proficiency, icon, sort_order) VALUES (?, ?, ?, ?, ?)', [name, category, proficiency, icon, finalOrder]);
-    const lastId = dbGet('SELECT last_insert_rowid() as id');
-    res.json({ success: true, id: lastId?.id });
+  app.post('/api/skills', requireAuth, async (req, res) => {
+    try {
+      const { name, category, proficiency, icon, sort_order } = req.body;
+      let finalOrder = sort_order;
+      if (finalOrder === undefined || finalOrder === null) {
+        const maxRow = await dbGet('SELECT COALESCE(MAX(sort_order), 0) as m FROM skills WHERE category = ?', [category || 'technical']);
+        finalOrder = (maxRow?.m || 0) + 1;
+      }
+      await dbRun('INSERT INTO skills (name, category, proficiency, icon, sort_order) VALUES (?, ?, ?, ?, ?)', [name, category, proficiency, icon, finalOrder]);
+      const lastId = await dbGet('SELECT last_insert_rowid() as id');
+      res.json({ success: true, id: lastId?.id });
+    } catch (err) { res.status(500).json({ error: err.message }); }
   });
 
-  app.put('/api/skills/:id', requireAuth, (req, res) => {
-    const { name, category, proficiency, icon, is_visible, sort_order } = req.body;
-    dbRun('UPDATE skills SET name = COALESCE(?, name), category = COALESCE(?, category), proficiency = COALESCE(?, proficiency), icon = COALESCE(?, icon), is_visible = COALESCE(?, is_visible), sort_order = COALESCE(?, sort_order) WHERE id = ?',
-      [name, category, proficiency, icon, is_visible, sort_order, parseInt(req.params.id)]);
-    res.json({ success: true });
+  app.put('/api/skills/:id', requireAuth, async (req, res) => {
+    try {
+      const { name, category, proficiency, icon, is_visible, sort_order } = req.body;
+      await dbRun('UPDATE skills SET name = COALESCE(?, name), category = COALESCE(?, category), proficiency = COALESCE(?, proficiency), icon = COALESCE(?, icon), is_visible = COALESCE(?, is_visible), sort_order = COALESCE(?, sort_order) WHERE id = ?',
+        [name, category, proficiency, icon, is_visible, sort_order, parseInt(req.params.id)]);
+      res.json({ success: true });
+    } catch (err) { res.status(500).json({ error: err.message }); }
   });
 
-  app.delete('/api/skills/:id', requireAuth, (req, res) => {
-    dbRun('DELETE FROM skills WHERE id = ?', [parseInt(req.params.id)]);
-    res.json({ success: true });
+  app.delete('/api/skills/:id', requireAuth, async (req, res) => {
+    try {
+      await dbRun('DELETE FROM skills WHERE id = ?', [parseInt(req.params.id)]);
+      res.json({ success: true });
+    } catch (err) { res.status(500).json({ error: err.message }); }
   });
 
   // ============ SERVICES API ============
-  app.get('/api/services', (req, res) => {
-    res.json(dbAll('SELECT * FROM services WHERE is_visible = 1 ORDER BY sort_order'));
+  app.get('/api/services', async (req, res) => {
+    try {
+      res.json(await dbAll('SELECT * FROM services WHERE is_visible = 1 ORDER BY sort_order'));
+    } catch (err) { res.status(500).json({ error: err.message }); }
   });
 
-  app.post('/api/services', requireAuth, (req, res) => {
-    const { title, description, icon, sort_order } = req.body;
-    let finalOrder = sort_order;
-    if (finalOrder === undefined || finalOrder === null) {
-      const maxRow = dbGet('SELECT COALESCE(MAX(sort_order), 0) as m FROM services');
-      finalOrder = (maxRow?.m || 0) + 1;
-    }
-    dbRun('INSERT INTO services (title, description, icon, sort_order) VALUES (?, ?, ?, ?)', [title, description, icon, finalOrder]);
-    const lastId = dbGet('SELECT last_insert_rowid() as id');
-    res.json({ success: true, id: lastId?.id });
+  app.post('/api/services', requireAuth, async (req, res) => {
+    try {
+      const { title, description, icon, sort_order } = req.body;
+      let finalOrder = sort_order;
+      if (finalOrder === undefined || finalOrder === null) {
+        const maxRow = await dbGet('SELECT COALESCE(MAX(sort_order), 0) as m FROM services');
+        finalOrder = (maxRow?.m || 0) + 1;
+      }
+      await dbRun('INSERT INTO services (title, description, icon, sort_order) VALUES (?, ?, ?, ?)', [title, description, icon, finalOrder]);
+      const lastId = await dbGet('SELECT last_insert_rowid() as id');
+      res.json({ success: true, id: lastId?.id });
+    } catch (err) { res.status(500).json({ error: err.message }); }
   });
 
-  app.put('/api/services/:id', requireAuth, (req, res) => {
-    const { title, description, icon, is_visible, sort_order } = req.body;
-    dbRun('UPDATE services SET title = COALESCE(?, title), description = COALESCE(?, description), icon = COALESCE(?, icon), is_visible = COALESCE(?, is_visible), sort_order = COALESCE(?, sort_order) WHERE id = ?',
-      [title, description, icon, is_visible, sort_order, parseInt(req.params.id)]);
-    res.json({ success: true });
+  app.put('/api/services/:id', requireAuth, async (req, res) => {
+    try {
+      const { title, description, icon, is_visible, sort_order } = req.body;
+      await dbRun('UPDATE services SET title = COALESCE(?, title), description = COALESCE(?, description), icon = COALESCE(?, icon), is_visible = COALESCE(?, is_visible), sort_order = COALESCE(?, sort_order) WHERE id = ?',
+        [title, description, icon, is_visible, sort_order, parseInt(req.params.id)]);
+      res.json({ success: true });
+    } catch (err) { res.status(500).json({ error: err.message }); }
   });
 
-  app.delete('/api/services/:id', requireAuth, (req, res) => {
-    dbRun('DELETE FROM services WHERE id = ?', [parseInt(req.params.id)]);
-    res.json({ success: true });
+  app.delete('/api/services/:id', requireAuth, async (req, res) => {
+    try {
+      await dbRun('DELETE FROM services WHERE id = ?', [parseInt(req.params.id)]);
+      res.json({ success: true });
+    } catch (err) { res.status(500).json({ error: err.message }); }
   });
 
   // ============ TESTIMONIALS API ============
-  app.get('/api/testimonials', (req, res) => {
-    res.json(dbAll('SELECT * FROM testimonials WHERE is_visible = 1 ORDER BY sort_order, created_at DESC'));
+  app.get('/api/testimonials', async (req, res) => {
+    try {
+      res.json(await dbAll('SELECT * FROM testimonials WHERE is_visible = 1 ORDER BY sort_order, created_at DESC'));
+    } catch (err) { res.status(500).json({ error: err.message }); }
   });
 
-  app.post('/api/testimonials', requireAuth, (req, res) => {
-    const { client_name, client_title, client_image, content, rating, sort_order } = req.body;
-    let finalOrder = sort_order;
-    if (finalOrder === undefined || finalOrder === null) {
-      const maxRow = dbGet('SELECT COALESCE(MAX(sort_order), 0) as m FROM testimonials');
-      finalOrder = (maxRow?.m || 0) + 1;
-    }
-    dbRun('INSERT INTO testimonials (client_name, client_title, client_image, content, rating, sort_order) VALUES (?, ?, ?, ?, ?, ?)',
-      [client_name, client_title, client_image, content, rating || 5, finalOrder]);
-    const lastId = dbGet('SELECT last_insert_rowid() as id');
-    res.json({ success: true, id: lastId?.id });
+  app.post('/api/testimonials', requireAuth, async (req, res) => {
+    try {
+      const { client_name, client_title, client_image, content, rating, sort_order } = req.body;
+      let finalOrder = sort_order;
+      if (finalOrder === undefined || finalOrder === null) {
+        const maxRow = await dbGet('SELECT COALESCE(MAX(sort_order), 0) as m FROM testimonials');
+        finalOrder = (maxRow?.m || 0) + 1;
+      }
+      await dbRun('INSERT INTO testimonials (client_name, client_title, client_image, content, rating, sort_order) VALUES (?, ?, ?, ?, ?, ?)',
+        [client_name, client_title, client_image, content, rating || 5, finalOrder]);
+      const lastId = await dbGet('SELECT last_insert_rowid() as id');
+      res.json({ success: true, id: lastId?.id });
+    } catch (err) { res.status(500).json({ error: err.message }); }
   });
 
-  app.put('/api/testimonials/:id', requireAuth, (req, res) => {
-    const { client_name, client_title, client_image, content, rating, is_visible, sort_order } = req.body;
-    dbRun('UPDATE testimonials SET client_name = COALESCE(?, client_name), client_title = COALESCE(?, client_title), client_image = COALESCE(?, client_image), content = COALESCE(?, content), rating = COALESCE(?, rating), is_visible = COALESCE(?, is_visible), sort_order = COALESCE(?, sort_order) WHERE id = ?',
-      [client_name, client_title, client_image, content, rating, is_visible, sort_order, parseInt(req.params.id)]);
-    res.json({ success: true });
+  app.put('/api/testimonials/:id', requireAuth, async (req, res) => {
+    try {
+      const { client_name, client_title, client_image, content, rating, is_visible, sort_order } = req.body;
+      await dbRun('UPDATE testimonials SET client_name = COALESCE(?, client_name), client_title = COALESCE(?, client_title), client_image = COALESCE(?, client_image), content = COALESCE(?, content), rating = COALESCE(?, rating), is_visible = COALESCE(?, is_visible), sort_order = COALESCE(?, sort_order) WHERE id = ?',
+        [client_name, client_title, client_image, content, rating, is_visible, sort_order, parseInt(req.params.id)]);
+      res.json({ success: true });
+    } catch (err) { res.status(500).json({ error: err.message }); }
   });
 
-  app.delete('/api/testimonials/:id', requireAuth, (req, res) => {
-    dbRun('DELETE FROM testimonials WHERE id = ?', [parseInt(req.params.id)]);
-    res.json({ success: true });
+  app.delete('/api/testimonials/:id', requireAuth, async (req, res) => {
+    try {
+      await dbRun('DELETE FROM testimonials WHERE id = ?', [parseInt(req.params.id)]);
+      res.json({ success: true });
+    } catch (err) { res.status(500).json({ error: err.message }); }
   });
 
   // ============ CONTACTS API ============
-  app.post('/api/contacts', (req, res) => {
-    const { name, email, phone, subject, message } = req.body;
-    if (!name || !email || !message) {
-      return res.status(400).json({ error: 'Name, email, and message are required' });
-    }
-    dbRun('INSERT INTO contacts (name, email, phone, subject, message) VALUES (?, ?, ?, ?, ?)', [name, email, phone, subject, message]);
-    dbRun("INSERT INTO analytics (event_type, page_url, ip_address, user_agent) VALUES ('contact_form', ?, ?, ?)",
-      [req.body.pageUrl || '/', req.ip, req.get('user-agent')]);
-    const lastId = dbGet('SELECT last_insert_rowid() as id');
-    res.json({ success: true, id: lastId?.id });
+  app.post('/api/contacts', async (req, res) => {
+    try {
+      const { name, email, phone, subject, message } = req.body;
+      if (!name || !email || !message) {
+        return res.status(400).json({ error: 'Name, email, and message are required' });
+      }
+      await dbRun('INSERT INTO contacts (name, email, phone, subject, message) VALUES (?, ?, ?, ?, ?)', [name, email, phone, subject, message]);
+      dbRun("INSERT INTO analytics (event_type, page_url, ip_address, user_agent) VALUES ('contact_form', ?, ?, ?)",
+        [req.body.pageUrl || '/', req.ip, req.get('user-agent')]).catch(() => {});
+      const lastId = await dbGet('SELECT last_insert_rowid() as id');
+      res.json({ success: true, id: lastId?.id });
+    } catch (err) { res.status(500).json({ error: err.message }); }
   });
 
-  app.get('/api/contacts', requireAuth, (req, res) => {
-    res.json(dbAll('SELECT * FROM contacts ORDER BY created_at DESC'));
+  app.get('/api/contacts', requireAuth, async (req, res) => {
+    try {
+      res.json(await dbAll('SELECT * FROM contacts ORDER BY created_at DESC'));
+    } catch (err) { res.status(500).json({ error: err.message }); }
   });
 
-  app.put('/api/contacts/:id/read', requireAuth, (req, res) => {
-    dbRun('UPDATE contacts SET is_read = 1 WHERE id = ?', [parseInt(req.params.id)]);
-    res.json({ success: true });
+  app.put('/api/contacts/:id/read', requireAuth, async (req, res) => {
+    try {
+      await dbRun('UPDATE contacts SET is_read = 1 WHERE id = ?', [parseInt(req.params.id)]);
+      res.json({ success: true });
+    } catch (err) { res.status(500).json({ error: err.message }); }
   });
 
-  app.delete('/api/contacts/:id', requireAuth, (req, res) => {
-    dbRun('DELETE FROM contacts WHERE id = ?', [parseInt(req.params.id)]);
-    res.json({ success: true });
+  app.delete('/api/contacts/:id', requireAuth, async (req, res) => {
+    try {
+      await dbRun('DELETE FROM contacts WHERE id = ?', [parseInt(req.params.id)]);
+      res.json({ success: true });
+    } catch (err) { res.status(500).json({ error: err.message }); }
   });
 
   // ============ STYLES API ============
-  app.get('/api/styles', (req, res) => {
-    const { category } = req.query;
-    let styles;
-    if (category) {
-      styles = dbAll('SELECT * FROM style_settings WHERE category = ?', [category]);
-    } else {
-      styles = dbAll('SELECT * FROM style_settings');
-    }
-    const stylesObj = {};
-    styles.forEach(s => { stylesObj[s.setting_key] = s.setting_value; });
-    res.json(stylesObj);
+  app.get('/api/styles', async (req, res) => {
+    try {
+      const { category } = req.query;
+      let styles;
+      if (category) {
+        styles = await dbAll('SELECT * FROM style_settings WHERE category = ?', [category]);
+      } else {
+        styles = await dbAll('SELECT * FROM style_settings');
+      }
+      const stylesObj = {};
+      styles.forEach(s => { stylesObj[s.setting_key] = s.setting_value; });
+      res.json(stylesObj);
+    } catch (err) { res.status(500).json({ error: err.message }); }
   });
 
-  app.put('/api/styles', (req, res) => {
-    const styles = req.body;
-    for (const [key, value] of Object.entries(styles)) {
-      const isFont = key.includes('font');
-      dbRun('INSERT OR IGNORE INTO style_settings (setting_key, setting_value, setting_type, category) VALUES (?, ?, ?, ?)',
-        [key, String(value), isFont ? 'font' : 'color', isFont ? 'typography' : 'colors']);
-      dbRun("UPDATE style_settings SET setting_value = ?, updated_at = datetime('now') WHERE setting_key = ?",
-        [String(value), key]);
-    }
-    res.json({ success: true });
+  app.put('/api/styles', async (req, res) => {
+    try {
+      const styles = req.body;
+      for (const [key, value] of Object.entries(styles)) {
+        const isFont = key.includes('font');
+        await dbRun('INSERT OR IGNORE INTO style_settings (setting_key, setting_value, setting_type, category) VALUES (?, ?, ?, ?)',
+          [key, String(value), isFont ? 'font' : 'color', isFont ? 'typography' : 'colors']);
+        await dbRun("UPDATE style_settings SET setting_value = ?, updated_at = datetime('now') WHERE setting_key = ?",
+          [String(value), key]);
+      }
+      res.json({ success: true });
+    } catch (err) { res.status(500).json({ error: err.message }); }
   });
 
   // ============ SITE CONFIG API ============
-  app.get('/api/config', (req, res) => {
-    const configs = dbAll('SELECT * FROM site_config');
-    const configObj = {};
-    configs.forEach(c => { configObj[c.config_key] = c.config_value; });
-    res.json(configObj);
+  app.get('/api/config', async (req, res) => {
+    try {
+      const configs = await dbAll('SELECT * FROM site_config');
+      const configObj = {};
+      configs.forEach(c => { configObj[c.config_key] = c.config_value; });
+      res.json(configObj);
+    } catch (err) { res.status(500).json({ error: err.message }); }
   });
 
-  app.put('/api/config', (req, res) => {
-    const configs = req.body;
-    for (const [key, value] of Object.entries(configs)) {
-      dbRun('INSERT OR IGNORE INTO site_config (config_key, config_value) VALUES (?, ?)', [key, String(value)]);
-      dbRun("UPDATE site_config SET config_value = ?, updated_at = datetime('now') WHERE config_key = ?", [String(value), key]);
-    }
-    res.json({ success: true });
+  app.put('/api/config', async (req, res) => {
+    try {
+      const configs = req.body;
+      for (const [key, value] of Object.entries(configs)) {
+        await dbRun('INSERT OR IGNORE INTO site_config (config_key, config_value) VALUES (?, ?)', [key, String(value)]);
+        await dbRun("UPDATE site_config SET config_value = ?, updated_at = datetime('now') WHERE config_key = ?", [String(value), key]);
+      }
+      res.json({ success: true });
+    } catch (err) { res.status(500).json({ error: err.message }); }
   });
 
   // ============ ANALYTICS API ============
-  app.post('/api/analytics', (req, res) => {
-    const { event_type, page_url } = req.body;
-    dbRun('INSERT INTO analytics (event_type, page_url, ip_address, user_agent) VALUES (?, ?, ?, ?)',
-      [event_type, page_url, req.ip, req.get('user-agent')]);
-    res.json({ success: true });
+  app.post('/api/analytics', async (req, res) => {
+    try {
+      const { event_type, page_url } = req.body;
+      await dbRun('INSERT INTO analytics (event_type, page_url, ip_address, user_agent) VALUES (?, ?, ?, ?)',
+        [event_type, page_url, req.ip, req.get('user-agent')]);
+      res.json({ success: true });
+    } catch (err) { res.status(500).json({ error: err.message }); }
   });
 
-  app.get('/api/analytics', requireAuth, (req, res) => {
-    const { period } = req.query;
-    let query = 'SELECT * FROM analytics';
-    let countQuery = "SELECT COUNT(*) as count FROM analytics WHERE event_type = 'page_view'";
-    let todayQuery = "SELECT COUNT(*) as count FROM analytics WHERE event_type = 'page_view' AND DATE(created_at) = DATE('now')";
+  app.get('/api/analytics', requireAuth, async (req, res) => {
+    try {
+      const { period } = req.query;
+      let query = 'SELECT * FROM analytics';
+      let countQuery = "SELECT COUNT(*) as count FROM analytics WHERE event_type = 'page_view'";
+      let todayQuery = "SELECT COUNT(*) as count FROM analytics WHERE event_type = 'page_view' AND DATE(created_at) = DATE('now')";
 
-    if (period === 'today') {
-      query += " WHERE DATE(created_at) = DATE('now')";
-    } else if (period === 'week') {
-      query += " WHERE created_at >= datetime('now', '-7 days')";
-    } else if (period === 'month') {
-      query += " WHERE created_at >= datetime('now', '-30 days')";
-    }
-
-    query += ' ORDER BY created_at DESC LIMIT 1000';
-
-    const analytics = dbAll(query);
-    const totalVisits = dbGet(countQuery);
-    const todayVisits = dbGet(todayQuery);
-    const totalContacts = dbGet('SELECT COUNT(*) as count FROM contacts');
-    const unreadContacts = dbGet('SELECT COUNT(*) as count FROM contacts WHERE is_read = 0');
-
-    res.json({
-      data: analytics,
-      stats: {
-        totalVisits: totalVisits?.count || 0,
-        todayVisits: todayVisits?.count || 0,
-        totalContacts: totalContacts?.count || 0,
-        unreadContacts: unreadContacts?.count || 0
+      if (period === 'today') {
+        query += " WHERE DATE(created_at) = DATE('now')";
+      } else if (period === 'week') {
+        query += " WHERE created_at >= datetime('now', '-7 days')";
+      } else if (period === 'month') {
+        query += " WHERE created_at >= datetime('now', '-30 days')";
       }
-    });
+
+      query += ' ORDER BY created_at DESC LIMIT 1000';
+
+      const analytics = await dbAll(query);
+      const totalVisits = await dbGet(countQuery);
+      const todayVisits = await dbGet(todayQuery);
+      const totalContacts = await dbGet('SELECT COUNT(*) as count FROM contacts');
+      const unreadContacts = await dbGet('SELECT COUNT(*) as count FROM contacts WHERE is_read = 0');
+
+      res.json({
+        data: analytics,
+        stats: {
+          totalVisits: totalVisits?.count || 0,
+          todayVisits: todayVisits?.count || 0,
+          totalContacts: totalContacts?.count || 0,
+          unreadContacts: unreadContacts?.count || 0
+        }
+      });
+    } catch (err) { res.status(500).json({ error: err.message }); }
   });
 
   // ============ FILE UPLOAD API ============
@@ -531,6 +493,4 @@ function createApp() {
   return app;
 }
 
-// ============ EXPORTS ============
-
-module.exports = { initApp, createApp, dbRun, dbGet, dbAll, saveDb };
+module.exports = { initDatabase, createApp };
