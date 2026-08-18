@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sulyman Abdulrafiu Kehinde - Islamic Educator & Web Designer</title>
+    <meta name="description" content="Professional portfolio of Sulyman Abdulrafiu Kehinde - Islamic educator, Arabic language specialist, curriculum developer, and web designer.">
+    <meta name="keywords" content="Islamic education, Arabic language, curriculum development, web design, portfolio">
+    <meta name="author" content="Sulyman Abdulrafiu Kehinde">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Sulyman Abdulrafiu Kehinde - Portfolio">
+    <meta property="og:description" content="Islamic educator, Arabic language specialist, curriculum developer, and web designer">
+    <meta property="og:type" content="website">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS (compiled locally -- no CDN dependency) -->
+    <link rel="stylesheet" href="/tailwind.css">
+    
+    <style>
+        /* Custom styles */
+        :root {
+            --primary: #3C1B69;
+            --primary-dark: #2A1350;
+            --primary-light: #5B3A8F;
+            --gold: #C9A96E;
+            --gold-dark: #B8963F;
+            --hero-title-color: #FFFFFF;
+            --hero-accent-color: #C9A96E;
+            --background: #3C1B69;
+            --card: #FFFFFF;
+            --text: #11071F;
+            --accent: #F5EDE3;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+        }
+        
+        .font-heading {
+            font-family: 'Playfair Display', serif;
+        }
+        
+        /* Glassmorphism */
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        /* Pattern Background */
+        .pattern-bg {
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23D4AF37' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        
+        /* Typing Effect */
+        .typing-effect {
+            border-right: 2px solid var(--primary);
+            white-space: nowrap;
+            overflow: hidden;
+            animation: typing 3s steps(40, end), blink-caret .75s step-end infinite;
+        }
+        
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+        
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: var(--primary); }
+        }
+        
+        /* Button Styles */
+        .btn-gold {
+            background-color: var(--gold);
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-gold:hover {
+            background-color: var(--gold-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(201, 169, 110, 0.3);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            color: #FFFFFF;
+            border: 2px solid rgba(255, 255, 255, 0.7);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-outline:hover {
+            background-color: rgba(255, 255, 255, 0.12);
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        /* Card Hover Effects */
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(60, 27, 105, 0.1);
+        }
+        
+        /* Progress Bar Animation */
+        .progress-bar {
+            transition: width 1.5s ease-out;
+        }
+        
+        /* Scroll Progress */
+        #scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--gold));
+            z-index: 9999;
+            transition: width 0.1s ease-out;
+        }
+        
+        /* Navigation Active State */
+        .nav-active {
+            color: var(--primary) !important;
+        }
+        
+        .nav-active::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--gold);
+        }
+        
+        /* Floating Animation */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .float-animation {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        /* Fade In Animation */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .project-preview-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: #f3f4f6;
+            pointer-events: none;
+        }
+        .project-card-wrap {
+            position: relative;
+        }
+        .project-card-wrap .project-link-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.15) 0%, transparent 40%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            z-index: 5;
+        }
+        .project-card-wrap:hover .project-link-overlay {
+            opacity: 1;
+        }
+        
+        /* Dark Mode */
+        .dark {
+            --background: #11071F;
+            --card: #1C1030;
+            --text: #F5F0FF;
+        }
+        
+        .dark body {
+            background-color: var(--background);
+            color: var(--text);
+        }
+        
+        .dark .glass {
+            background: rgba(28, 16, 48, 0.7);
+        }
+        
+        /* Mobile Navigation */
+        .mobile-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: white;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 9998;
+        }
+        
+        @media (min-width: 768px) {
+            .mobile-nav {
+                display: none;
+            }
+        }
+        
+    </style>
+    <link rel="stylesheet" href="/editor.css">
+</head>
+<body class="pattern-bg min-h-screen">
+    <!-- Scroll Progress Bar -->
+    <div id="scroll-progress"></div>
+    
+    <!-- Navigation -->
+    <header id="navbar" class="fixed top-0 left-0 right-0 z-50 glass transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <!-- Logo -->
+                <a href="#" class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-lg">SAK</span>
+                    </div>
+                    <span class="font-heading text-xl font-bold text-primary hidden sm:block">Sulyman.A.K</span>
+                </a>
+                
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex items-center gap-8">
+                    <a href="#home" class="relative text-sm font-medium text-gray-700 hover:text-primary transition nav-link">Home</a>
+                    <a href="#about" class="relative text-sm font-medium text-gray-700 hover:text-primary transition nav-link">About</a>
+                    <a href="#education" class="relative text-sm font-medium text-gray-700 hover:text-primary transition nav-link">Education</a>
+                    <a href="#skills" class="relative text-sm font-medium text-gray-700 hover:text-primary transition nav-link">Skills</a>
+                    <a href="/projects" class="relative text-sm font-medium text-gray-700 hover:text-primary transition nav-link">Projects</a>
+                    <a href="#services" class="relative text-sm font-medium text-gray-700 hover:text-primary transition nav-link">Services</a>
+                    <a href="#contact" class="relative text-sm font-medium text-gray-700 hover:text-primary transition nav-link">Contact</a>
+                </nav>
+                
+                <!-- CTA Button -->
+                <a href="#contact" class="hidden md:flex btn-primary px-6 py-2 rounded-lg text-sm font-medium items-center gap-2">
+                    Contact Me
+                    <span class="material-symbols-outlined text-lg">arrow_forward</span>
+                </a>
+                
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-btn" class="md:hidden text-gray-700" onclick="toggleMobileMenu()">
+                    <span class="material-symbols-outlined text-2xl">menu</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Mobile Navigation -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t">
+            <nav class="flex flex-col py-4">
+                <a href="#home" class="px-6 py-3 text-gray-700 hover:bg-gray-50 hover:text-primary">Home</a>
+                <a href="#about" class="px-6 py-3 text-gray-700 hover:bg-gray-50 hover:text-primary">About</a>
+                <a href="#education" class="px-6 py-3 text-gray-700 hover:bg-gray-50 hover:text-primary">Education</a>
+                <a href="#skills" class="px-6 py-3 text-gray-700 hover:bg-gray-50 hover:text-primary">Skills</a>
+                <a href="/projects" class="px-6 py-3 text-gray-700 hover:bg-gray-50 hover:text-primary">Projects</a>
+                <a href="#services" class="px-6 py-3 text-gray-700 hover:bg-gray-50 hover:text-primary">Services</a>
+                <a href="#contact" class="px-6 py-3 text-primary font-medium">Contact</a>
+            </nav>
+        </div>
+    </header>
+    
+    <!-- Main Content -->
+    <main class="pt-20">
+        <!-- Hero Section -->
+        <section id="home" class="min-h-screen flex items-center pattern-bg">
+            <div class="max-w-7xl mx-auto px-6 py-20">
+                <div class="grid md:grid-cols-2 gap-12 items-center">
+                    <div class="fade-in">
+                        <div class="inline-flex items-center gap-2 bg-white/80 px-4 py-2 rounded-full mb-6 border border-accent">
+                            <span class="material-symbols-outlined text-primary text-lg">menu_book</span>
+                            <span id="content-hero-badge" class="text-sm font-medium text-primary">Educator & Designer</span>
+                        </div>
+                        
+                        <h1 id="content-hero-title" class="font-heading text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight" style="color:var(--hero-title-color)">
+                            Bridging Islamic Scholarship, Arabic Excellence, and <span style="color:var(--hero-accent-color)">Modern Educational Innovation</span>
+                        </h1>
+                        
+                        <div class="h-12 mb-8">
+                            <p id="content-hero-typing" class="text-lg text-purple-100 typing-effect inline-block">
+                                I blend traditional rigor with digital craftsmanship.
+                            </p>
+                        </div>
+                        
+                        <div class="flex flex-wrap gap-4 mb-12">
+                            <a href="/projects" class="btn-gold px-8 py-3 rounded-lg font-medium flex items-center gap-2">
+                                <span id="content-btn-projects">View Projects</span>
+                                <span class="material-symbols-outlined">arrow_right_alt</span>
+                            </a>
+                            <a href="#" class="btn-outline px-8 py-3 rounded-lg font-medium flex items-center gap-2">
+                                <span id="content-btn-cv">Download CV</span>
+                                <span class="material-symbols-outlined">download</span>
+                            </a>
+                        </div>
+                        
+                        <div class="flex items-center gap-8 text-purple-100">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-gold">verified</span>
+                                <span id="content-stat-exp" class="text-sm">10+ Years Experience</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-gold">school</span>
+                                <span id="content-stat-islamic" class="text-sm">Islamic Sciences</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="hidden md:flex justify-center items-center fade-in">
+                        <div id="hero-photo-block" class="relative">
+                            <!-- Decorative rings -->
+                            <div class="absolute -inset-6 bg-gradient-to-br from-primary/15 to-gold/15 rounded-3xl animate-pulse"></div>
+                            <div class="absolute -inset-12 bg-gradient-to-br from-primary/8 to-gold/8 rounded-3xl"></div>
+                            
+                            <!-- Image frame -->
+                            <div id="hero-frame" class="relative w-80 h-96 rounded-3xl overflow-hidden border-4 border-white shadow-2xl group">
+                                <img id="hero-image" src="/uploads/hero-photo.jpg" 
+                                     alt="Sulyman Abdulrafiu Kehinde" 
+                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                                     onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22320%22 height=%22384%22><defs><linearGradient id=%22g%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%221%22><stop offset=%220%25%22 stop-color=%22%233C1B69%22/><stop offset=%22100%25%22 stop-color=%22%235B3A8F%22/></linearGradient></defs><rect fill=%22url(%23g)%22 width=%22320%22 height=%22384%22/><text x=%22160%22 y=%22180%22 text-anchor=%22middle%22 fill=%22white%22 font-size=%2272%22 font-family=%22serif%22 font-weight=%22bold%22>SAK</text><text x=%22160%22 y=%22230%22 text-anchor=%22middle%22 fill=%22rgba(255,255,255,0.6)%22 font-size=%2214%22 font-family=%22sans-serif%22>Upload your photo</text></svg>'">
+                                <!-- Hover overlay -->
+                                <div class="absolute inset-0 bg-gradient-to-t from-primary/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                <!-- Edit photo hint (shown in content edit mode) -->
+                                <div id="edit-photo-hint" class="hidden absolute inset-x-0 bottom-4 mx-auto w-fit items-center gap-2 z-10">
+                                    <button type="button" onclick="document.getElementById('hero-upload').click()" class="bg-primary text-white text-xs font-medium px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 cursor-pointer hover:bg-primary-dark transition">
+                                        <span class="material-symbols-outlined text-sm">add_a_photo</span>
+                                        Change photo
+                                    </button>
+                                    <button type="button" onclick="removeHeroPhoto()" class="bg-red-600 text-white text-xs font-medium px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 cursor-pointer hover:bg-red-700 transition">
+                                        <span class="material-symbols-outlined text-sm">delete</span>
+                                        Remove photo
+                                    </button>
+                                </div>
+                                
+                                <!-- Upload prompt -->
+                                <div id="upload-prompt" class="absolute bottom-4 left-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                    <label for="hero-upload" class="cursor-pointer w-full bg-white/90 backdrop-blur-sm text-primary px-4 py-2.5 rounded-xl text-sm font-medium flex items-center justify-center gap-2 hover:bg-white transition shadow-lg">
+                                        <span class="material-symbols-outlined text-lg">add_a_photo</span>
+                                        Upload Photo
+                                    </label>
+                                    <input type="file" id="hero-upload" accept="image/*" class="hidden" onchange="uploadHeroPhoto(this)">
+                                </div>
+                            </div>
+                            
+                            <!-- Floating badges (rendered from site config — editable in the style editor) -->
+                            <div id="hero-badges" class="hero-badges-container absolute inset-0"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- About Section -->
+        <section id="about" class="py-24 bg-white relative overflow-hidden">
+            <!-- Decorative watermark -->
+            <span class="hidden md:block absolute -top-10 -right-10 text-primary/5 select-none pointer-events-none" style="font-size: 22rem; line-height: 1;">"</span>
+            <div class="max-w-7xl mx-auto px-6 relative">
+                <!-- Section heading -->
+                <div class="text-center mb-16 fade-in">
+                    <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <span class="material-symbols-outlined text-3xl text-primary" style="font-variation-settings: 'FILL' 1;">person</span>
+                    </div>
+                    <h2 id="content-about-section-title" class="font-heading text-4xl md:text-5xl font-bold text-primary">Who I Am</h2>
+                    <div class="mx-auto mt-5 w-20 h-1.5 rounded-full bg-gradient-to-r from-gold to-primary"></div>
+                </div>
+                
+                <div class="grid lg:grid-cols-12 gap-8 items-start">
+                    <!-- Education -->
+                    <div class="lg:col-span-7 fade-in">
+                        <div id="about-education-card" class="rounded-2xl bg-primary p-8 md:p-10 text-white shadow-lg card-hover h-full">
+                            <div class="flex items-center gap-4 mb-6">
+                                <div class="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center shrink-0">
+                                    <span class="material-symbols-outlined text-3xl text-gold" style="font-variation-settings: 'FILL' 1;">school</span>
+                                </div>
+                                <h2 id="content-about-title" class="font-heading text-3xl font-bold">Education</h2>
+                            </div>
+                            
+                            <p id="content-about-text-1" class="text-purple-100 leading-relaxed">
+                                I am Sulyman Abdulrafiu Kehinde, an Islamic educator, Qur'anic memorization and Tajwid instructor, Arabic language specialist, curriculum developer, web designer, and educational technology enthusiast. My academic and professional journey spans Islamic sciences, Arabic and Qur'anic education, teaching, curriculum development, and digital design. I am committed to continuous learning and to developing expertise that enables me to contribute meaningfully to both Islamic education and the wider educational landscape.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- Professional Approach + Mission -->
+                    <div class="lg:col-span-5 space-y-8">
+                        <!-- Professional Approach -->
+                        <div class="fade-in">
+                            <div id="about-approach-card" class="rounded-2xl bg-primary p-8 text-white shadow-lg card-hover">
+                                <div class="flex items-center gap-4 mb-5">
+                                    <div class="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center shrink-0">
+                                        <span class="material-symbols-outlined text-2xl text-gold" style="font-variation-settings: 'FILL' 1;">lightbulb</span>
+                                    </div>
+                                    <h3 id="content-approach-title" class="font-heading text-2xl font-bold">Professional Approach</h3>
+                                </div>
+                                <p id="content-approach-text" class="text-purple-100 leading-relaxed">
+                                    With a foundation in Islamic sciences and education, complemented by modern web technologies and digital design, I approach educational challenges from both a scholarly and technological perspective. I seek to translate educational needs into practical solutions—whether through curriculum development, instructional resources, digital platforms, or engaging learning experiences.
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <!-- Mission -->
+                        <div class="fade-in">
+                            <div id="about-mission-card" class="rounded-2xl bg-primary p-8 text-white shadow-lg card-hover">
+                                <div class="flex items-center gap-4 mb-5">
+                                    <div class="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center shrink-0">
+                                        <span class="material-symbols-outlined text-2xl text-gold" style="font-variation-settings: 'FILL' 1;">auto_stories</span>
+                                    </div>
+                                    <h3 id="content-mission-title" class="font-heading text-2xl font-bold">Mission</h3>
+                                </div>
+                                <p id="content-mission-text" class="text-purple-100 leading-relaxed">
+                                    My mission is to empower educational institutions and individuals with meaningful, effective, and sustainable learning solutions. I aim to preserve the richness of Islamic knowledge while improving how it is taught, organized, and accessed through sound pedagogy, thoughtful curriculum design, and purposeful use of technology. Through this work, I hope to contribute to an educational future where authentic knowledge and modern innovation complement one another.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Education Section -->
+        <section id="education" class="py-24 pattern-bg">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="text-center mb-16 fade-in">
+                    <h2 id="content-education-title" class="font-heading text-3xl md:text-4xl font-bold text-white mb-4">Education</h2>
+                    <p id="content-education-subtitle" class="text-purple-100 max-w-2xl mx-auto">Academic foundation in Islamic Sciences and Modern Education</p>
+                </div>
+                
+                <div class="max-w-3xl mx-auto" id="education-timeline">
+                    <!-- Education items are rendered dynamically from site config -->
+                </div>
+            </div>
+        </section>
+        
+        <!-- Skills Section -->
+        <section id="skills" class="py-24 bg-white">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="text-center mb-16 fade-in">
+                    <h2 id="content-skills-title" class="font-heading text-3xl md:text-4xl font-bold text-gray-900 mb-4">Skills & Expertise</h2>
+                    <p id="content-skills-subtitle" class="text-gray-600 max-w-2xl mx-auto">Bridging traditional Islamic sciences with modern digital innovation</p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-12">
+                    <!-- Technical Skills -->
+                    <div class="fade-in">
+                        <div class="flex items-center gap-3 mb-8">
+                            <span class="material-symbols-outlined text-primary text-3xl">code</span>
+                            <h3 id="content-skills-technical" class="font-heading text-2xl font-bold text-gray-900">Technical Arsenal</h3>
+                        </div>
+                        
+                        <div class="space-y-6" id="technical-skills">
+                            <!-- Skills will be loaded dynamically -->
+                        </div>
+                    </div>
+                    
+                    <!-- Islamic Sciences -->
+                    <div class="fade-in">
+                        <div class="flex items-center gap-3 mb-8">
+                            <span class="material-symbols-outlined text-primary text-3xl">menu_book</span>
+                            <h3 id="content-skills-islamic" class="font-heading text-2xl font-bold text-gray-900">Islamic Sciences</h3>
+                        </div>
+                        
+                        <div class="flex flex-wrap gap-3" id="islamic-skills">
+                            <!-- Skills will be loaded dynamically -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Core Competencies -->
+                <div class="mt-16 fade-in">
+                    <div class="flex items-center gap-3 mb-8">
+                        <span class="material-symbols-outlined text-primary text-3xl">explore</span>
+                        <h3 id="content-skills-competencies" class="font-heading text-2xl font-bold text-gray-900">Core Competencies</h3>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-6" id="core-competencies">
+                        <!-- Competencies will be loaded dynamically -->
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Projects Section -->
+        <section id="projects" class="py-24 pattern-bg">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="text-center mb-16 fade-in">
+                    <h2 id="content-projects-title" class="font-heading text-3xl md:text-4xl font-bold text-white mb-4">Featured Projects</h2>
+                    <p id="content-projects-subtitle" class="text-purple-100 max-w-2xl mx-auto">A synthesis of academic rigor and creative digital mastery</p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8" id="projects-grid">
+                    <!-- Projects will be loaded dynamically -->
+                </div>
+                
+                <div class="text-center mt-12 fade-in">
+                    <a href="/projects" class="inline-flex items-center gap-2 btn-gold px-8 py-3 rounded-lg font-medium">
+                        <span id="content-btn-projects-all">View All Projects</span>
+                        <span class="material-symbols-outlined">arrow_forward</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Philosophy Section -->
+        <section id="philosophy" class="py-24 bg-primary-dark text-white border-y border-gold/30">
+            <div class="max-w-4xl mx-auto px-6 text-center fade-in">
+                <span class="material-symbols-outlined text-6xl text-gold mb-6" style="font-variation-settings: 'FILL' 1;">auto_stories</span>
+                <h2 id="content-philosophy-title" class="font-heading text-3xl md:text-4xl font-bold mb-8">Teaching Philosophy</h2>
+                <p id="content-philosophy-quote" class="text-xl leading-relaxed opacity-90">
+                    "My teaching philosophy combines authentic Islamic scholarship with engaging modern instructional methods. I believe education should nurture knowledge, character, leadership, and lifelong learning while remaining rooted in the Qur'an and Sunnah."
+                </p>
+            </div>
+        </section>
+        
+        <!-- Services Section -->
+        <section id="services" class="py-24 bg-white">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="text-center mb-16 fade-in">
+                    <h2 id="content-services-title" class="font-heading text-3xl md:text-4xl font-bold text-gray-900 mb-4">Services</h2>
+                    <p id="content-services-subtitle" class="text-gray-600 max-w-2xl mx-auto">Comprehensive solutions for educational excellence</p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6" id="services-grid">
+                    <!-- Services will be loaded dynamically -->
+                </div>
+            </div>
+        </section>
+        
+        <!-- Testimonials Section -->
+        <section id="testimonials" class="py-24 pattern-bg">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="text-center mb-16 fade-in">
+                    <h2 id="content-testimonials-title" class="font-heading text-3xl md:text-4xl font-bold text-white mb-4">Testimonials</h2>
+                    <p id="content-testimonials-subtitle" class="text-purple-100 max-w-2xl mx-auto">What others say about working with me</p>
+                </div>
+                
+                <div class="grid md:grid-cols-3 gap-8" id="testimonials-grid">
+                    <!-- Testimonials will be loaded dynamically -->
+                </div>
+            </div>
+        </section>
+        
+        <!-- Contact Section -->
+        <section id="contact" class="py-24 bg-white">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="text-center mb-16 fade-in">
+                    <h2 id="content-contact-title" class="font-heading text-3xl md:text-4xl font-bold text-gray-900 mb-4">Let's Connect</h2>
+                    <p id="content-contact-subtitle" class="text-gray-600 max-w-2xl mx-auto">Whether you're seeking a modern digital presence, academic collaboration, or insightful discourse, I invite you to reach out.</p>
+                </div>
+                
+                <div class="grid lg:grid-cols-2 gap-12">
+                    <!-- Contact Info -->
+                    <div class="fade-in">
+                        <div class="glass rounded-xl p-8 border border-accent">
+                            <h3 id="content-contact-info-title" class="font-heading text-xl font-bold text-gray-900 mb-6">Contact Information</h3>
+                            
+                            <div class="space-y-6">
+                                <div class="flex items-start gap-4">
+                                    <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-primary">mail</span>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500 uppercase tracking-wider mb-1">Email</p>
+                                        <a id="content-contact-email" href="mailto:contact@sulymanak.com" class="text-gray-900 hover:text-primary transition">contact@sulymanak.com</a>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-start gap-4">
+                                    <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-primary">location_on</span>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500 uppercase tracking-wider mb-1">Location</p>
+                                        <p id="content-contact-location" class="text-gray-900">Available Worldwide</p>
+                                        <p id="content-contact-location-sub" class="text-gray-500 text-sm">Based in London, UK</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-8 pt-8 border-t border-gray-200">
+                                <p class="text-sm text-gray-500 uppercase tracking-wider mb-4">Professional Networks</p>
+                                <div class="flex gap-4">
+                                    <a href="#" class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 hover:bg-primary hover:text-white transition">
+                                        <span class="material-symbols-outlined">work</span>
+                                    </a>
+                                    <a href="#" class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 hover:bg-primary hover:text-white transition">
+                                        <span class="material-symbols-outlined">terminal</span>
+                                    </a>
+                                    <a href="#" class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 hover:bg-primary hover:text-white transition">
+                                        <span class="material-symbols-outlined">school</span>
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <a href="#" class="mt-8 w-full py-4 border-2 border-primary text-primary rounded-lg font-medium flex items-center justify-center gap-2 hover:bg-primary hover:text-white transition">
+                                <span class="material-symbols-outlined">download</span>
+                                <span id="content-btn-cv-contact">Download CV</span>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Contact Form -->
+                    <div class="fade-in">
+                        <form id="contact-form" class="glass rounded-xl p-8 border border-accent">
+                            <div class="grid md:grid-cols-3 gap-6 mb-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
+                                    <input type="text" name="name" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition" placeholder="Sulyman A.K">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Email Address *</label>
+                                    <input type="email" name="email" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition" placeholder="sulymankehinde3@gmail.com">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                                    <input type="tel" name="phone" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition" placeholder="08103300529">
+                                </div>
+                            </div>
+                            
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Subject *</label>
+                                <select name="subject" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition">
+                                    <option value="">Select Inquiry Type</option>
+                                    <option value="web">Web Design / Development</option>
+                                    <option value="academic">Academic / Islamic Sciences</option>
+                                    <option value="consulting">Consulting</option>
+                                    <option value="other">Other Inquiry</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Message *</label>
+                                <textarea name="message" required rows="5" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition resize-none" placeholder="Please describe the purpose of your inquiry..."></textarea>
+                            </div>
+                            
+                            <button type="submit" class="w-full btn-primary py-4 rounded-lg font-medium flex items-center justify-center gap-2">
+                                <span>Send Message</span>
+                                <span class="material-symbols-outlined">send</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-16">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-8">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-lg">SAK</span>
+                    </div>
+                    <span class="font-heading text-xl font-bold">Sulyman.A.K</span>
+                </div>
+                
+                <nav class="flex flex-wrap justify-center gap-6">
+                    <a href="#about" class="text-gray-400 hover:text-white transition">About</a>
+                    <a href="#services" class="text-gray-400 hover:text-white transition">Services</a>
+                    <a href="/projects" class="text-gray-400 hover:text-white transition">Projects</a>
+                    <a href="#contact" class="text-gray-400 hover:text-white transition">Contact</a>
+                </nav>
+                
+                <div class="flex items-center gap-4">
+                    <a href="#" class="text-gray-400 hover:text-white transition">
+                        <span class="material-symbols-outlined">work</span>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition">
+                        <span class="material-symbols-outlined">terminal</span>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition">
+                        <span class="material-symbols-outlined">mail</span>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p id="content-footer-copyright" class="text-gray-400 text-sm">© 2024 Sulyman Abdulrafiu Kehinde. All rights reserved.</p>
+                <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="text-gray-400 hover:text-white transition flex items-center gap-2 text-sm">
+                    Back to Top
+                    <span class="material-symbols-outlined text-lg">arrow_upward</span>
+                </button>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Mobile Bottom Navigation -->
+    <nav class="mobile-nav md:hidden">
+        <div class="flex justify-around items-center py-2">
+            <a href="#home" class="flex flex-col items-center p-2 text-gray-600 hover:text-primary">
+                <span class="material-symbols-outlined">home</span>
+                <span class="text-xs mt-1">Home</span>
+            </a>
+            <a href="#about" class="flex flex-col items-center p-2 text-gray-600 hover:text-primary">
+                <span class="material-symbols-outlined">person</span>
+                <span class="text-xs mt-1">About</span>
+            </a>
+            <a href="/projects" class="flex flex-col items-center p-2 text-gray-600 hover:text-primary">
+                <span class="material-symbols-outlined">work</span>
+                <span class="text-xs mt-1">Projects</span>
+            </a>
+            <a href="#skills" class="flex flex-col items-center p-2 text-gray-600 hover:text-primary">
+                <span class="material-symbols-outlined">school</span>
+                <span class="text-xs mt-1">Skills</span>
+            </a>
+            <a href="#contact" class="flex flex-col items-center p-2 text-primary">
+                <span class="material-symbols-outlined">mail</span>
+                <span class="text-xs mt-1">Contact</span>
+            </a>
+        </div>
+    </nav>
+    
+    <script>
+        // ============ TOAST NOTIFICATIONS ============
+        async function loadData() {
+            // Fetch each API independently: one failing request must never drop the
+            // saved styles/content (that used to make everything revert to the
+            // static HTML defaults on refresh).
+            const fetchJson = (url) => fetch(url)
+                .then(r => r.ok ? r.json() : Promise.reject(new Error(url + ' ' + r.status)))
+                .catch(err => { console.error('Failed to load', url, err.message); return null; });
+            
+            const [sections, projects, skills, services, testimonials, styles, config] = await Promise.all([
+                fetchJson('/api/sections'),
+                fetchJson('/api/projects'),
+                fetchJson('/api/skills'),
+                fetchJson('/api/services'),
+                fetchJson('/api/testimonials'),
+                fetchJson('/api/styles'),
+                fetchJson('/api/config')
+            ]);
+            
+            // Apply saved styles (fall back to the local mirror only if the server is unreachable)
+            if (styles) {
+                applyStyles(styles);
+            } else {
+                try {
+                    const localStyles = JSON.parse(localStorage.getItem('portfolio-styles'));
+                    if (localStyles) applyStyles(localStyles);
+                } catch (e) {}
+            }
+            
+            // Apply saved content
+            if (config) {
+                applyContent(config);
+            } else {
+                try {
+                    const localContent = JSON.parse(localStorage.getItem('portfolio-content'));
+                    if (localContent) applyContent(localContent);
+                } catch (e) {}
+            }
+            
+            // Render dynamic lists (defaults only when their endpoint failed)
+            if (skills) renderSkills(skills);
+            if (projects) renderProjects(projects);
+            if (services) renderServices(services);
+            if (testimonials) renderTestimonials(testimonials);
+            if (!skills) loadDefaultData();
+            
+            // On refresh the browser restores the scroll position and fires a scroll
+            // event BEFORE the fetches above resolve, so fade-in elements already in
+            // view would never get the .visible class and stay invisible. Reveal them
+            // now that everything is rendered.
+            handleFadeIn();
+        }
+        
+        // Reveal freshly injected .fade-in cards that are already in the viewport,
+        // so dynamically rendered lists are never stuck invisible (e.g. after a
+        // refresh that restores the scroll before the data loads). Cards below the
+        // fold still fade in as the user scrolls.
+        function revealFadeIns(scope) {
+            setTimeout(() => {
+                (scope || document).querySelectorAll('.fade-in').forEach(el => {
+                    const rect = el.getBoundingClientRect();
+                    if (rect.top < window.innerHeight - 150) el.classList.add('visible');
+                });
+            }, 60);
+        }
+        
+        // Render technical skills
+        function renderSkills(skills) {
+            const technicalContainer = document.getElementById('technical-skills');
+            const islamicContainer = document.getElementById('islamic-skills');
+            
+            const technicalSkills = skills.filter(s => s.category === 'technical');
+            const islamicSkills = skills.filter(s => s.category === 'islamic');
+            
+            // Technical skills with progress bars
+            technicalContainer.innerHTML = technicalSkills.map(skill => `
+                <div class="skill-item">
+                    <div class="flex justify-between mb-2">
+                        <span class="text-sm font-medium text-gray-700">${skill.name}</span>
+                        <span class="text-sm text-gray-500">${skill.proficiency}%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                        <div class="progress-bar bg-primary h-2 rounded-full" style="width: 0%" data-target="${skill.proficiency}"></div>
+                    </div>
+                </div>
+            `).join('');
+            
+            // Islamic skills as tags
+            islamicContainer.innerHTML = islamicSkills.map(skill => `
+                <span class="inline-flex items-center gap-2 px-4 py-2 bg-accent/50 text-primary rounded-full text-sm font-medium border border-accent">
+                    <span class="material-symbols-outlined text-lg">${skill.icon || 'menu_book'}</span>
+                    ${skill.name}
+                </span>
+            `).join('');
+            
+            // Core competencies are rendered by the shared editor (editor.js) from
+            // the saved site config — see renderCompetencies().
+            
+            // Animate progress bars
+            setTimeout(() => {
+                document.querySelectorAll('.progress-bar').forEach(bar => {
+                    const target = bar.getAttribute('data-target');
+                    bar.style.width = target + '%';
+                });
+            }, 500);
+        }
+        
+        // Render projects
+        function renderProjects(projects) {
+            const container = document.getElementById('projects-grid');
+            
+            container.innerHTML = projects.map((project, index) => `
+                <div id="project-card-${index}" data-project-index="${index}" class="glass rounded-xl overflow-hidden card-hover border border-accent fade-in ${index === 0 ? 'md:col-span-2' : ''}">
+                    <div class="h-48 bg-gray-100 relative overflow-hidden">
+                        ${project.project_url ? `
+                        <iframe src="${project.project_url.match(/^https?:\/\//) ? project.project_url : 'https://' + project.project_url}" class="w-full h-full border-none" sandbox="allow-scripts allow-same-origin" loading="lazy" title="${project.title} preview"></iframe>
+                        ` : `
+                        <img src="${project.image_url}" alt="${project.title}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500">
+                        `}
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-heading text-xl font-bold text-gray-900 mb-3">${project.title}</h3>
+                        <p class="text-gray-600 text-sm mb-4">${project.description}</p>
+                        <div class="flex flex-wrap gap-2">
+                            ${(project.technologies || '').split(',').map(tech => `
+                                <span class="px-3 py-1 bg-accent/50 text-primary rounded-full text-xs font-medium">${tech.trim()}</span>
+                            `).join('')}
+                        </div>
+                        ${project.project_url ? `
+                        <a href="${project.project_url.match(/^https?:\/\//) ? project.project_url : 'https://' + project.project_url}" target="_blank" class="inline-flex items-center gap-1.5 mt-4 text-primary text-sm font-medium hover:underline">
+                            <span class="material-symbols-outlined text-base">open_in_new</span> View Live Prototype
+                        </a>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+            revealFadeIns(container);
+        }
+        
+        // Render services
+        function renderServices(services) {
+            const container = document.getElementById('services-grid');
+            
+            container.innerHTML = services.map(service => `
+                <div class="glass rounded-xl p-6 text-center card-hover border border-accent fade-in">
+                    <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="material-symbols-outlined text-3xl text-primary" style="font-variation-settings: 'FILL' 1;">${service.icon}</span>
+                    </div>
+                    <h3 class="font-heading text-lg font-bold text-gray-900 mb-2">${service.title}</h3>
+                    <p class="text-gray-600 text-sm">${service.description}</p>
+                </div>
+            `).join('');
+            revealFadeIns(container);
+        }
+        
+        // Render testimonials
+        function renderTestimonials(testimonials) {
+            const container = document.getElementById('testimonials-grid');
+            
+            container.innerHTML = testimonials.map(testimonial => `
+                <div class="glass rounded-xl p-6 border border-accent fade-in">
+                    <span class="material-symbols-outlined text-4xl text-accent mb-4">format_quote</span>
+                    <p class="text-gray-600 italic mb-6">"${testimonial.content}"</p>
+                    <div class="flex items-center gap-4">
+                        <img src="${testimonial.client_image}" alt="${testimonial.client_name}" class="w-12 h-12 rounded-full object-cover">
+                        <div>
+                            <h4 class="font-medium text-gray-900">${testimonial.client_name}</h4>
+                            <p class="text-sm text-gray-500">${testimonial.client_title}</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            revealFadeIns(container);
+        }
+        
+        // Load default data if API fails
+        function loadDefaultData() {
+            // Default technical skills
+            const technicalSkills = [
+                { name: 'HTML/CSS', proficiency: 95 },
+                { name: 'JavaScript/TypeScript', proficiency: 85 },
+                { name: 'React/Next.js', proficiency: 80 },
+                { name: 'Tailwind CSS', proficiency: 90 },
+                { name: 'Node.js', proficiency: 70 },
+                { name: 'Figma', proficiency: 85 }
+            ];
+            
+            const islamicSkills = [
+                { name: 'Qur\'anic Memorization', icon: 'menu_book' },
+                { name: 'Tajwid', icon: 'menu_book' },
+                { name: 'Arabic Grammar (Nahw)', icon: 'menu_book' },
+                { name: 'Arabic Morphology (Sarf)', icon: 'menu_book' },
+                { name: 'Islamic Jurisprudence', icon: 'menu_book' },
+                { name: 'Curriculum Planning', icon: 'school' },
+                { name: 'Student Mentorship', icon: 'people' }
+            ];
+            
+            const technicalContainer = document.getElementById('technical-skills');
+            const islamicContainer = document.getElementById('islamic-skills');
+            
+            technicalContainer.innerHTML = technicalSkills.map(skill => `
+                <div class="skill-item">
+                    <div class="flex justify-between mb-2">
+                        <span class="text-sm font-medium text-gray-700">${skill.name}</span>
+                        <span class="text-sm text-gray-500">${skill.proficiency}%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                        <div class="progress-bar bg-primary h-2 rounded-full" style="width: 0%" data-target="${skill.proficiency}"></div>
+                    </div>
+                </div>
+            `).join('');
+            
+            islamicContainer.innerHTML = islamicSkills.map(skill => `
+                <span class="inline-flex items-center gap-2 px-4 py-2 bg-accent/50 text-primary rounded-full text-sm font-medium border border-accent">
+                    <span class="material-symbols-outlined text-lg">${skill.icon}</span>
+                    ${skill.name}
+                </span>
+            `).join('');
+            
+            // Animate progress bars
+            setTimeout(() => {
+                document.querySelectorAll('.progress-bar').forEach(bar => {
+                    const target = bar.getAttribute('data-target');
+                    bar.style.width = target + '%';
+                });
+            }, 500);
+        }
+        
+        // ============ NAVIGATION ============
+        
+        // Active nav link on scroll
+        function updateActiveNav() {
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (window.scrollY >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.classList.remove('nav-active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('nav-active');
+                }
+            });
+        }
+        
+        // Scroll progress bar
+        function updateScrollProgress() {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const scrollPercent = (scrollTop / docHeight) * 100;
+            document.getElementById('scroll-progress').style.width = scrollPercent + '%';
+        }
+        
+        // Navbar shadow on scroll
+        function updateNavbar() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('shadow-lg');
+            } else {
+                navbar.classList.remove('shadow-lg');
+            }
+        }
+        
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+        
+        // Fade in animation on scroll
+        function handleFadeIn() {
+            const elements = document.querySelectorAll('.fade-in');
+            elements.forEach(el => {
+                const elementTop = el.getBoundingClientRect().top;
+                const elementVisible = 150;
+                if (elementTop < window.innerHeight - elementVisible) {
+                    el.classList.add('visible');
+                }
+            });
+        }
+        
+        // ============ CONTACT FORM ============
+        
+        document.getElementById('contact-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+            data.pageUrl = window.location.href;
+            
+            try {
+                const response = await fetch('/api/contacts', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('Message sent successfully!');
+                    e.target.reset();
+                } else {
+                    alert('Failed to send message. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Message sent successfully!');
+                e.target.reset();
+            }
+        });
+        
+        // ============ HERO IMAGE UPLOAD ============
+        
+        // ============ EVENT LISTENERS ============
+        
+        window.addEventListener('scroll', () => {
+            updateActiveNav();
+            updateScrollProgress();
+            updateNavbar();
+            handleFadeIn();
+        });
+        
+        // Close mobile menu when clicking a link
+        document.querySelectorAll('#mobile-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById('mobile-menu').classList.add('hidden');
+            });
+        });
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            handleFadeIn();
+        });
+        
+        // ============ LIVE STYLE PREVIEW (from Admin) ============
+        window.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'preview-styles') {
+                const s = event.data.styles;
+                if (s.primary_color) document.documentElement.style.setProperty('--primary', s.primary_color);
+                if (s.gold_color) document.documentElement.style.setProperty('--gold', s.gold_color);
+                if (s.background_color) {
+                    document.documentElement.style.setProperty('--background', s.background_color);
+                    document.body.style.backgroundColor = s.background_color;
+                }
+                if (s.text_color) {
+                    document.documentElement.style.setProperty('--text', s.text_color);
+                    document.body.style.color = s.text_color;
+                }
+                if (s.heading_font) {
+                    document.querySelectorAll('.font-heading').forEach(el => {
+                        el.style.fontFamily = `'${s.heading_font}', serif`;
+                    });
+                }
+                if (s.body_font) document.body.style.fontFamily = `'${s.body_font}', sans-serif`;
+                if (s.container_width) {
+                    document.querySelectorAll('.max-w-7xl').forEach(el => {
+                        el.style.maxWidth = s.container_width + 'px';
+                    });
+                }
+                if (s.dark_mode === 'true') {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            }
+        });
+    </script>
+<script>
+    window.PAGE_CONTENT_FIELDS = [
+            // Hero
+            { key: 'hero_badge', label: 'Hero badge', type: 'text', category: 'Hero', ids: ['content-hero-badge'] },
+            { key: 'hero_title_accent', label: 'Highlighted part of headline', type: 'text', category: 'Hero', ids: ['content-hero-accent'] },
+            { key: 'hero_title', label: 'Hero headline', type: 'textarea', category: 'Hero', heroTitle: true, ids: ['content-hero-title'] },
+            { key: 'hero_typing', label: 'Hero subtitle (typing line)', type: 'text', category: 'Hero', ids: ['content-hero-typing'] },
+            { key: 'btn_projects', label: 'Button: View Projects', type: 'text', category: 'Hero', ids: ['content-btn-projects'] },
+            { key: 'btn_cv', label: 'Button: Download CV', type: 'text', category: 'Hero', ids: ['content-btn-cv', 'content-btn-cv-contact'] },
+            { key: 'stat_experience', label: 'Hero stat 1', type: 'text', category: 'Hero', ids: ['content-stat-exp'] },
+            { key: 'stat_islamic', label: 'Hero stat 2', type: 'text', category: 'Hero', ids: ['content-stat-islamic'] },
+            // About & Mission
+            { key: 'about_section_title', label: 'About: page title', type: 'text', category: 'About & Mission', ids: ['content-about-section-title'] },
+            { key: 'about_title', label: 'Education: title', type: 'text', category: 'About & Mission', ids: ['content-about-title'] },
+            { key: 'about_text_1', label: 'About: text', type: 'textarea', category: 'About & Mission', ids: ['content-about-text-1'] },
+            { key: 'approach_title', label: 'Approach: heading', type: 'text', category: 'About & Mission', ids: ['content-approach-title'] },
+            { key: 'approach_text', label: 'Approach: text', type: 'textarea', category: 'About & Mission', ids: ['content-approach-text'] },
+            { key: 'mission_title', label: 'Mission: heading', type: 'text', category: 'About & Mission', ids: ['content-mission-title'] },
+            { key: 'mission_text', label: 'Mission: text', type: 'textarea', category: 'About & Mission', ids: ['content-mission-text'] },
+            // Education & Skills
+            { key: 'education_title', label: 'Education: title', type: 'text', category: 'Education & Skills', ids: ['content-education-title'] },
+            { key: 'education_subtitle', label: 'Education: subtitle', type: 'text', category: 'Education & Skills', ids: ['content-education-subtitle'] },
+            { key: 'skills_title', label: 'Skills: title', type: 'text', category: 'Education & Skills', ids: ['content-skills-title'] },
+            { key: 'skills_subtitle', label: 'Skills: subtitle', type: 'text', category: 'Education & Skills', ids: ['content-skills-subtitle'] },
+            { key: 'skills_technical', label: 'Skills: Technical Arsenal heading', type: 'text', category: 'Education & Skills', ids: ['content-skills-technical'] },
+            { key: 'skills_islamic', label: 'Skills: Islamic Sciences heading', type: 'text', category: 'Education & Skills', ids: ['content-skills-islamic'] },
+            { key: 'skills_competencies', label: 'Skills: Core Competencies heading', type: 'text', category: 'Education & Skills', ids: ['content-skills-competencies'] },
+            // Projects & Philosophy
+            { key: 'projects_title', label: 'Projects: title', type: 'text', category: 'Projects & Philosophy', ids: ['content-projects-title'] },
+            { key: 'projects_subtitle', label: 'Projects: subtitle', type: 'text', category: 'Projects & Philosophy', ids: ['content-projects-subtitle'] },
+            { key: 'btn_projects_all', label: 'Button: View All Projects', type: 'text', category: 'Projects & Philosophy', ids: ['content-btn-projects-all'] },
+            { key: 'philosophy_title', label: 'Philosophy: title', type: 'text', category: 'Projects & Philosophy', ids: ['content-philosophy-title'] },
+            { key: 'philosophy_quote', label: 'Philosophy: quote', type: 'textarea', category: 'Projects & Philosophy', ids: ['content-philosophy-quote'] },
+            // Services & Testimonials
+            { key: 'services_title', label: 'Services: title', type: 'text', category: 'Services & Testimonials', ids: ['content-services-title'] },
+            { key: 'services_subtitle', label: 'Services: subtitle', type: 'text', category: 'Services & Testimonials', ids: ['content-services-subtitle'] },
+            { key: 'testimonials_title', label: 'Testimonials: title', type: 'text', category: 'Services & Testimonials', ids: ['content-testimonials-title'] },
+            { key: 'testimonials_subtitle', label: 'Testimonials: subtitle', type: 'text', category: 'Services & Testimonials', ids: ['content-testimonials-subtitle'] },
+            // Contact & Footer
+            { key: 'contact_title', label: 'Contact: title', type: 'text', category: 'Contact & Footer', ids: ['content-contact-title'] },
+            { key: 'contact_subtitle', label: 'Contact: subtitle', type: 'text', category: 'Contact & Footer', ids: ['content-contact-subtitle'] },
+            { key: 'contact_info_title', label: 'Contact: info heading', type: 'text', category: 'Contact & Footer', ids: ['content-contact-info-title'] },
+            { key: 'contact_email', label: 'Contact: email', type: 'text', category: 'Contact & Footer', ids: ['content-contact-email'], email: true },
+            { key: 'contact_location', label: 'Contact: location', type: 'text', category: 'Contact & Footer', ids: ['content-contact-location'] },
+            { key: 'contact_location_sub', label: 'Contact: location detail', type: 'text', category: 'Contact & Footer', ids: ['content-contact-location-sub'] },
+            { key: 'footer_copyright', label: 'Footer: copyright', type: 'text', category: 'Contact & Footer', ids: ['content-footer-copyright'] }
+        ];
+</script>
+    <script src="/editor.js"></script>
+</body>
+</html>

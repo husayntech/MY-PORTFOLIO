@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+
+<html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Contact &amp; Footer - Sulyman A.K.</title>
+<!-- Google Fonts & Material Symbols -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed-variant": "#574500",
+                        "on-tertiary-fixed-variant": "#51462a",
+                        "surface-container-highest": "#6B44B8",
+                        "secondary-fixed": "#ffe088",
+                        "error-container": "#ffdad6",
+                        "error": "#ba1a1a",
+                        "surface-container-high": "#5A349F",
+                        "on-tertiary": "#ffffff",
+                        "primary-container": "#4A2382",
+                        "primary": "#C9A227",
+                        "tertiary-fixed": "#f2e1bb",
+                        "on-error-container": "#93000a",
+                        "on-primary-fixed": "#002115",
+                        "inverse-primary": "#E4C65B",
+                        "on-primary-fixed-variant": "#005139",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed": "#241a00",
+                        "primary-fixed": "#E4C65B",
+                        "background": "#3C1B69",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-fixed": "#231b04",
+                        "surface": "#3C1B69",
+                        "inverse-on-surface": "#eaf1ff",
+                        "surface-container": "#402070",
+                        "outline": "#A98FD4",
+                        "primary-fixed-dim": "#C9A227",
+                        "on-secondary-container": "#745c00",
+                        "inverse-surface": "#27313f",
+                        "on-background": "#EDE4F7",
+                        "surface-bright": "#4E2B8F",
+                        "on-secondary": "#ffffff",
+                        "secondary-container": "#fed65b",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-low": "#35175F",
+                        "on-tertiary-container": "#ebdab5",
+                        "on-primary-container": "#EDE4F7",
+                        "surface-variant": "#C6CEC8",
+                        "tertiary": "#53482c",
+                        "secondary-fixed-dim": "#e9c349",
+                        "outline-variant": "#8A75A8",
+                        "surface-dim": "#2A1350",
+                        "secondary": "#735c00",
+                        "surface-tint": "#056c4d",
+                        "tertiary-container": "#6b5f42",
+                        "on-surface-variant": "#CBBBE0",
+                        "tertiary-fixed-dim": "#d5c5a1",
+                        "on-surface": "#EDE4F7"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "container-max": "1200px",
+                        "gutter": "24px",
+                        "section-padding-mobile": "64px",
+                        "base": "8px",
+                        "section-padding-desktop": "120px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Playfair Display"],
+                        "display-lg": ["Playfair Display"],
+                        "body-lg": ["Inter"],
+                        "display-lg-mobile": ["Playfair Display"],
+                        "headline-md": ["Playfair Display"],
+                        "body-md": ["Inter"],
+                        "label-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "display-lg": ["56px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "1.7", "fontWeight": "400" }],
+                        "display-lg-mobile": ["40px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .pattern-overlay {
+            background-image: url('data:image/svg+xml;utf8,<svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><path d="M20 0l2 18 18 2-18 2-2 18-2-18-18-2 18-2z" fill="%230b6e4f" fill-opacity="0.03"/></svg>');
+            background-repeat: repeat;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background antialiased selection:bg-secondary-container selection:text-on-secondary-container">
+<!-- Top Navigation (Active: Contact/None - using semantic fallback) -->
+<header class="fixed top-0 w-full z-50 bg-surface/70 dark:bg-surface-container-highest/70 backdrop-blur-md shadow-sm dark:shadow-none transition-all duration-300 ease-in-out hidden md:block" id="top-nav">
+<div class="flex justify-between items-center px-gutter py-4 max-w-container-max mx-auto">
+<div class="flex items-center gap-2 text-primary dark:text-primary-fixed hover:text-primary transition-colors duration-300 cursor-pointer">
+<span class="material-symbols-outlined" data-icon="architecture" data-weight="fill" style="font-variation-settings: 'FILL' 1;">architecture</span>
+<span class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed">Sulyman.A.K</span>
+</div>
+<nav class="hidden md:flex gap-8 items-center">
+<!-- Hiding standard nav items to prioritize the contact canvas -->
+<a class="font-label-md text-label-md text-primary dark:text-primary-fixed border-b-2 border-secondary-container pb-1 hover:text-primary transition-colors duration-300" href="#contact">Contact Me</a>
+</nav>
+</div>
+</header>
+<main class="relative pt-section-padding-mobile md:pt-section-padding-desktop">
+<!-- Background Pattern -->
+<div class="absolute inset-0 pattern-overlay pointer-events-none z-[-1]"></div>
+<!-- Contact Section -->
+<section class="px-gutter max-w-container-max mx-auto pb-section-padding-mobile md:pb-section-padding-desktop" id="contact">
+<div class="text-center mb-16 relative">
+<h1 class="font-display-lg-mobile md:font-display-lg text-primary mb-4">Let's Connect</h1>
+<p class="font-body-lg text-on-surface-variant max-w-2xl mx-auto">Whether you're seeking a modern digital presence, academic collaboration, or insightful discourse, I invite you to reach out.</p>
+<div class="absolute left-1/2 -bottom-8 transform -translate-x-1/2 w-16 h-1 bg-secondary-container"></div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+<!-- Contact Info & Map (Left Column) -->
+<div class="lg:col-span-5 flex flex-col gap-8">
+<!-- Info Card -->
+<div class="bg-surface-container-lowest border border-tertiary-fixed rounded-xl p-8 shadow-[0_4px_20px_rgba(11,110,79,0.04)] hover:border-secondary-container transition-colors duration-300 relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity duration-300 pointer-events-none">
+<span class="material-symbols-outlined text-[100px] text-primary" data-icon="mail">mail</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-primary mb-6">Contact Information</h2>
+<ul class="space-y-6">
+<li class="flex items-start gap-4">
+<div class="bg-surface-container-low p-3 rounded-full text-primary">
+<span class="material-symbols-outlined" data-icon="mail">mail</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mb-1">Email</p>
+<a class="font-body-md text-body-md text-on-background hover:text-primary transition-colors underline decoration-secondary-container/30 hover:decoration-secondary-container underline-offset-4" href="mailto:contact@sulymanak.com">contact@sulymanak.com</a>
+</div>
+</li>
+<li class="flex items-start gap-4">
+<div class="bg-surface-container-low p-3 rounded-full text-primary">
+<span class="material-symbols-outlined" data-icon="location_on">location_on</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mb-1">Location</p>
+<p class="font-body-md text-body-md text-on-background">Available Worldwide<br/><span class="text-on-surface-variant text-sm">Based in London, UK</span></p>
+</div>
+</li>
+</ul>
+<div class="mt-8 pt-8 border-t border-outline-variant/30">
+<p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mb-4">Professional Networks</p>
+<div class="flex gap-4">
+<a aria-label="LinkedIn" class="w-12 h-12 flex items-center justify-center rounded-full bg-surface-container-low text-primary hover:bg-tertiary-fixed hover:text-on-tertiary-fixed-variant transition-colors duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="work">work</span>
+</a>
+<a aria-label="GitHub" class="w-12 h-12 flex items-center justify-center rounded-full bg-surface-container-low text-primary hover:bg-tertiary-fixed hover:text-on-tertiary-fixed-variant transition-colors duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="terminal">terminal</span>
+</a>
+<a aria-label="Academic Profile" class="w-12 h-12 flex items-center justify-center rounded-full bg-surface-container-low text-primary hover:bg-tertiary-fixed hover:text-on-tertiary-fixed-variant transition-colors duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="school">school</span>
+</a>
+</div>
+</div>
+<div class="mt-8">
+<button class="w-full py-4 px-6 rounded-sm bg-transparent border border-primary text-primary font-label-md text-label-md uppercase tracking-wider hover:bg-[#EAD9B4] hover:text-primary transition-all duration-300 flex items-center justify-center gap-2 group">
+<span class="material-symbols-outlined group-hover:-translate-y-1 transition-transform duration-300" data-icon="download">download</span>
+                                 Download Curriculum Vitae
+                             </button>
+</div>
+</div>
+<!-- Map Map Placeholder -->
+<div class="h-64 rounded-xl overflow-hidden bg-surface-container-low border border-outline-variant/20 relative group cursor-crosshair">
+<img class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500" data-alt="A stylized, high-end minimalist map centered on London. The map uses a light theme with subtle warm beige and deep primary green accents for water bodies and major roads. A sophisticated, soft white glow emanates from the center, creating an elegant, academic aesthetic suitable for a professional portfolio. Subtle Islamic geometric patterns are very faintly visible in the ocean areas." data-location="London" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKE6l4zOHD1YUdQc82sVQPQiivnPerY4OFJHHtYOxM-PQNFcuOYCq2rVPmMUlCz4DH_4UU7ZChlRxgI08UKev5qwNx6zYA1jFPH2CKy4d-iRKcqRVF_LuOJJAKOW7Zohtcx9wl-6kro8bNaKKpO9ZtCJhXNkhoWF0zOsVKFaXWCtP_99dk2Zu1AkeNGOeiHsZq1Qu9YOzbQiaxgJq2SMEO4kuggcZ09q42uQdrs2nOjTcNEEw_sWYg"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-low/50 to-transparent pointer-events-none"></div>
+<div class="absolute bottom-4 left-4 bg-surface-container-lowest/90 backdrop-blur-sm py-2 px-4 rounded-sm border border-tertiary-fixed flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-sm" data-icon="public">public</span>
+<span class="font-label-md text-label-md text-primary">London, UK</span>
+</div>
+</div>
+</div>
+<!-- Contact Form (Right Column) -->
+<div class="lg:col-span-7">
+<div class="bg-surface-container-lowest border border-tertiary-fixed rounded-xl p-8 md:p-10 shadow-[0_4px_20px_rgba(11,110,79,0.04)] hover:border-secondary-container transition-colors duration-300 relative">
+<!-- Decorative top corner -->
+<div class="absolute top-0 right-0 w-16 h-16 border-t-2 border-r-2 border-secondary-container rounded-tr-xl opacity-30 m-2 pointer-events-none"></div>
+<form action="#" class="space-y-8 relative z-10" id="contactForm" method="POST">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<!-- Name Input -->
+<div class="relative group">
+<label class="block font-label-md text-label-md text-on-surface-variant mb-2 uppercase tracking-wider" for="name">Full Name <span class="text-error">*</span></label>
+<input class="w-full bg-transparent border-0 border-b border-outline-variant focus:border-primary focus:ring-0 px-0 py-3 font-body-md text-body-md text-on-background placeholder:text-outline/50 transition-colors duration-300" id="name" name="name" placeholder="John Doe" required="" type="text"/>
+<div class="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary-container group-focus-within:w-full transition-all duration-500"></div>
+</div>
+<!-- Email Input -->
+<div class="relative group">
+<label class="block font-label-md text-label-md text-on-surface-variant mb-2 uppercase tracking-wider" for="email">Email Address <span class="text-error">*</span></label>
+<input class="w-full bg-transparent border-0 border-b border-outline-variant focus:border-primary focus:ring-0 px-0 py-3 font-body-md text-body-md text-on-background placeholder:text-outline/50 transition-colors duration-300" id="email" name="email" placeholder="john@example.com" required="" type="email"/>
+<div class="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary-container group-focus-within:w-full transition-all duration-500"></div>
+</div>
+</div>
+<!-- Subject Input -->
+<div class="relative group">
+<label class="block font-label-md text-label-md text-on-surface-variant mb-2 uppercase tracking-wider" for="subject">Subject <span class="text-error">*</span></label>
+<div class="relative">
+<select class="w-full bg-transparent border-0 border-b border-outline-variant focus:border-primary focus:ring-0 px-0 py-3 font-body-md text-body-md text-on-background appearance-none cursor-pointer" id="subject" name="subject" required="">
+<option class="text-outline" disabled="" selected="" value="">Select Inquiry Type</option>
+<option class="text-on-background" value="web">Web Design / Development</option>
+<option class="text-on-background" value="academic">Academic / Islamic Sciences</option>
+<option class="text-on-background" value="consulting">Consulting</option>
+<option class="text-on-background" value="other">Other Inquiry</option>
+</select>
+<div class="absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+<div class="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary-container group-focus-within:w-full transition-all duration-500"></div>
+</div>
+<!-- Message Input -->
+<div class="relative group">
+<label class="block font-label-md text-label-md text-on-surface-variant mb-2 uppercase tracking-wider" for="message">Message <span class="text-error">*</span></label>
+<textarea class="w-full bg-transparent border border-outline-variant focus:border-primary focus:ring-0 p-4 rounded-sm font-body-md text-body-md text-on-background placeholder:text-outline/50 transition-colors duration-300 resize-none" id="message" name="message" placeholder="Please describe the purpose of your inquiry..." required="" rows="5"></textarea>
+<div class="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary-container group-focus-within:w-full transition-all duration-500 rounded-b-sm"></div>
+</div>
+<!-- Submit Button -->
+<div class="pt-4 flex items-center justify-between">
+<p class="text-sm text-on-surface-variant hidden md:block">* All fields are required</p>
+<button class="w-full md:w-auto bg-primary text-on-primary py-4 px-10 rounded-sm font-label-md text-label-md uppercase tracking-wider hover:bg-on-primary-fixed-variant transition-all duration-300 hover:border-b-2 hover:border-secondary-container flex items-center justify-center gap-3 group relative overflow-hidden" type="submit">
+<span class="relative z-10 flex items-center gap-2">
+                                        Send Message
+                                        <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform duration-300" data-icon="send">send</span>
+</span>
+</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer Component Execution -->
+<footer class="w-full py-section-padding-mobile md:py-16 bg-surface-container-low dark:bg-surface-container-lowest border-t border-secondary-fixed">
+<div class="flex flex-col md:flex-row justify-between items-center px-gutter max-w-container-max mx-auto gap-8 relative">
+<!-- Logo Section -->
+<div class="flex flex-col items-center md:items-start gap-4">
+<img alt="SAK Professional Logo" class="w-16 h-16 object-cover rounded-sm border border-tertiary-fixed shadow-sm" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAdq2PZPiYTLnyf7y7Fa_mJM7PRa4YoFin0Cx39bfSsaoQDSG4DfahT6t_fS8R5OOdkG35B8d5dWfftFvUlwN0kBDEqNOEmLR8fJhvjfGMmEYBA2zbgltnZbLJ_kOi0YOelBNSTNFRdVyHdlnq3e15gS0Y2T6iZPo66RXTI3zimJXNL6tzJSx9tuSgB_raIdGPz-RnE37WhTXvyy9FmUZ3OK-UtrbgIlczVoUlyPc6NwBqmVhpvOV19"/>
+<span class="font-headline-md text-headline-md text-primary opacity-80 hover:opacity-100 transition-opacity">Sulyman.A.K</span>
+</div>
+<!-- Links (Semantic match active state: 'Contact') -->
+<nav class="flex flex-wrap justify-center gap-6">
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary transition-colors opacity-80 hover:opacity-100 transition-opacity" href="#">Philosophy</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary transition-colors opacity-80 hover:opacity-100 transition-opacity" href="#">Services</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary transition-colors opacity-80 hover:opacity-100 transition-opacity" href="#">Experience</a>
+<a class="font-body-md text-body-md text-primary font-bold opacity-80 hover:opacity-100 transition-opacity" href="#contact">Contact</a>
+</nav>
+<!-- Copyright & Back to Top -->
+<div class="flex flex-col items-center md:items-end gap-4">
+<p class="font-body-md text-body-md text-on-surface-variant text-center md:text-right">© 2024 Sulyman Abdulrafiu Kehinde. All rights reserved.</p>
+<button aria-label="Back to Top" class="flex items-center gap-2 text-primary hover:text-secondary transition-colors opacity-80 hover:opacity-100 font-label-md text-label-md uppercase" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+                    Back to Top
+                    <span class="material-symbols-outlined" data-icon="arrow_upward">arrow_upward</span>
+</button>
+</div>
+</div>
+</footer>
+<!-- Bottom Nav Bar (Mobile Only - Supressed contextually due to transactional/focused nature of Contact form, but required by component list. Rendering with active 'Home' as fallback, though ideally hidden here) -->
+<nav class="fixed bottom-0 w-full z-50 block md:hidden bg-surface dark:bg-surface-dim shadow-[0_-4px_10px_rgba(0,0,0,0.05)] pb-safe border-t border-outline-variant/20">
+<div class="fixed bottom-0 left-0 w-full flex justify-around items-center p-2 pb-safe bg-surface dark:bg-surface-dim">
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high scale-95 transition-transform p-2 rounded-lg" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="home">home</span>
+<span class="font-label-md text-[10px]">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high scale-95 transition-transform p-2 rounded-lg" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="person">person</span>
+<span class="font-label-md text-[10px]">About</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high scale-95 transition-transform p-2 rounded-lg" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="work">work</span>
+<span class="font-label-md text-[10px]">Work</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high scale-95 transition-transform p-2 rounded-lg" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="terminal">terminal</span>
+<span class="font-label-md text-[10px]">Skill</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-4 py-1 hover:bg-surface-container-high scale-95 transition-transform" href="#contact">
+<span class="material-symbols-outlined mb-1" data-icon="school">school</span>
+<span class="font-label-md text-[10px]">Expert</span>
+</a>
+</div>
+</nav>
+<script>
+        // Optional subtle header shadow on scroll
+        window.addEventListener('scroll', () => {
+            const header = document.getElementById('top-nav');
+            if (window.scrollY > 20) {
+                header.classList.add('shadow-md');
+                header.classList.remove('shadow-sm');
+            } else {
+                header.classList.remove('shadow-md');
+                header.classList.add('shadow-sm');
+            }
+        });
+
+        // Basic form validation script to add visual feedback
+        const form = document.getElementById('contactForm');
+        if(form) {
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const btn = form.querySelector('button[type="submit"]');
+                const originalText = btn.innerHTML;
+                
+                btn.innerHTML = '<span class="relative z-10 flex items-center gap-2">Sending... <span class="material-symbols-outlined animate-spin" data-icon="sync">sync</span></span>';
+                btn.disabled = true;
+                btn.classList.add('opacity-80');
+
+                // Simulate API call
+                setTimeout(() => {
+                    btn.innerHTML = '<span class="relative z-10 flex items-center gap-2">Message Sent! <span class="material-symbols-outlined text-secondary-container" data-icon="check_circle">check_circle</span></span>';
+                    btn.classList.replace('bg-primary', 'bg-primary-container');
+                    
+                    setTimeout(() => {
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                        btn.classList.remove('opacity-80');
+                        btn.classList.replace('bg-primary-container', 'bg-primary');
+                        form.reset();
+                    }, 3000);
+                }, 1500);
+            });
+        }
+    </script>
+</body></html>

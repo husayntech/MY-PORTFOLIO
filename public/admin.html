@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Sulyman A.K. Portfolio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/tailwind.css">
+    <link rel="stylesheet" href="/editor.css">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        .sidebar { width: 260px; transition: transform 0.3s ease; }
+        .main-content { margin-left: 260px; transition: margin-left 0.3s ease; }
+        .nav-item.active { background: linear-gradient(135deg, #3C1B69 0%, #2A1350 100%); color: white; }
+        .nav-item:hover:not(.active) { background: #f3f4f6; }
+        .card-hover { transition: all 0.2s ease; }
+        .card-hover:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .toast { animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+        .preview-frame { border: none; width: 100%; height: 500px; border-radius: 8px; background: white; }
+        .color-swatch { width: 48px; height: 48px; border-radius: 8px; cursor: pointer; border: 2px solid #e5e7eb; transition: all 0.2s; }
+        .color-swatch:hover { border-color: #3C1B69; transform: scale(1.05); }
+        input[type="color"] { -webkit-appearance: none; border: none; width: 48px; height: 48px; cursor: pointer; border-radius: 8px; }
+        input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+        input[type="color"]::-webkit-color-swatch { border: none; border-radius: 6px; }
+        .modal-backdrop { background: rgba(17, 7, 31, 0.6); backdrop-filter: blur(4px); }
+        .stat-card { background: linear-gradient(135deg, #FFFFFF 0%, #FAF8FC 100%); }
+        @media (max-width: 768px) {
+            .sidebar { position: fixed; z-index: 50; transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-left: 0 !important; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed top-4 right-4 z-[100] space-y-2"></div>
+    
+    <!-- Login Modal -->
+    <div id="login-modal" class="fixed inset-0 modal-backdrop flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl p-8 w-full max-w-md mx-4 shadow-2xl">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-gradient-to-br from-primary to-primary-dark rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                    <span class="text-white font-bold text-2xl">SAK</span>
+                </div>
+                <h1 class="text-2xl font-bold text-gray-900">Welcome Back</h1>
+                <p class="text-gray-500 mt-2">Sign in to manage your portfolio</p>
+            </div>
+            <form id="login-form" class="space-y-5">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+                    <input type="text" id="username" required class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition" placeholder="Enter username">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                    <input type="password" id="password" required class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition" placeholder="Enter password">
+                </div>
+                <div id="login-error" class="hidden bg-red-50 text-red-600 text-sm p-3 rounded-lg"></div>
+                <button type="submit" class="w-full bg-gradient-to-r from-primary to-primary-dark text-white py-3 rounded-xl font-medium hover:shadow-lg transition-all duration-300">
+                    Sign In
+                </button>
+            </form>
+            <p class="text-center text-gray-400 text-xs mt-6">Default: admin / admin123</p>
+        </div>
+    </div>
+    
+    <!-- Dashboard -->
+    <div id="dashboard" class="hidden">
+        <!-- Mobile Header -->
+        <div class="md:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-200 z-40 px-4 py-3 flex items-center justify-between">
+            <button onclick="toggleSidebar()" class="p-2 hover:bg-gray-100 rounded-lg">
+                <span class="material-symbols-outlined">menu</span>
+            </button>
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                    <span class="text-white font-bold text-sm">SAK</span>
+                </div>
+                <span class="font-bold text-gray-900">Admin</span>
+            </div>
+            <button onclick="logout()" class="p-2 text-red-500 hover:bg-red-50 rounded-lg">
+                <span class="material-symbols-outlined">logout</span>
+            </button>
+        </div>
+        
+        <!-- Sidebar Overlay -->
+        <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden" onclick="toggleSidebar()"></div>
+        
+        <!-- Sidebar -->
+        <aside id="sidebar" class="sidebar fixed left-0 top-0 bg-white border-r border-gray-200 z-50 h-full overflow-y-auto">
+            <div class="p-5 border-b border-gray-100">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-primary to-primary-dark rounded-xl flex items-center justify-center shadow-md">
+                        <span class="text-white font-bold">SAK</span>
+                    </div>
+                    <div>
+                        <h2 class="font-bold text-gray-900 text-sm">Admin Panel</h2>
+                        <p class="text-xs text-gray-400">Portfolio Management</p>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="p-3">
+                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3 mb-2">Main</p>
+                <div class="space-y-1">
+                    <button onclick="showSection('dashboard')" class="nav-item active w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-left text-sm" data-section="dashboard">
+                        <span class="material-symbols-outlined text-xl">dashboard</span>
+                        <span>Dashboard</span>
+                    </button>
+                    <button onclick="showSection('content')" class="nav-item w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-left text-sm text-gray-600" data-section="content">
+                        <span class="material-symbols-outlined text-xl">article</span>
+                        <span>Content</span>
+                    </button>
+                    <button onclick="showSection('projects')" class="nav-item w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-left text-sm text-gray-600" data-section="projects">
+                        <span class="material-symbols-outlined text-xl">work</span>
+                        <span>Projects</span>
+                    </button>
+                    <button onclick="showSection('skills')" class="nav-item w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-left text-sm text-gray-600" data-section="skills">
+                        <span class="material-symbols-outlined text-xl">school</span>
+                        <span>Skills</span>
+                    </button>
+                    <button onclick="showSection('services')" class="nav-item w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-left text-sm text-gray-600" data-section="services">
+                        <span class="material-symbols-outlined text-xl">handyman</span>
+                        <span>Services</span>
+                    </button>
+                    <button onclick="showSection('testimonials')" class="nav-item w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-left text-sm text-gray-600" data-section="testimonials">
+                        <span class="material-symbols-outlined text-xl">format_quote</span>
+                        <span>Testimonials</span>
+                    </button>
+                    <a href="/projects" target="_blank" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-left text-sm text-gray-600 hover:bg-gray-50">
+                        <span class="material-symbols-outlined text-xl">open_in_new</span>
+                        <span>Projects Page</span>
+                    </a>
+                </div>
+                
+                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3 mb-2 mt-6">Management</p>
+                <div class="space-y-1">
+                    <button onclick="showSection('contacts')" class="nav-item w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-left text-sm text-gray-600" data-section="contacts">
+                        <span class="material-symbols-outlined text-xl">mail</span>
+                        <span>Messages</span>
+                        <span id="unread-badge" class="hidden ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">0</span>
+                    </button>
+                    <button onclick="showSection('analytics')" class="nav-item w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-left text-sm text-gray-600" data-section="analytics">
+                        <span class="material-symbols-outlined text-xl">analytics</span>
+                        <span>Analytics</span>
+                    </button>
+                </div>
+                
+                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3 mb-2 mt-6">Customize</p>
+                <div class="space-y-1">
+                    <button onclick="showSection('styles')" class="nav-item w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-left text-sm text-gray-600" data-section="styles">
+                        <span class="material-symbols-outlined text-xl">palette</span>
+                        <span>Style Editor</span>
+                    </button>
+                    <button onclick="showSection('settings')" class="nav-item w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-left text-sm text-gray-600" data-section="settings">
+                        <span class="material-symbols-outlined text-xl">settings</span>
+                        <span>Settings</span>
+                    </button>
+                </div>
+            </nav>
+            
+            <div class="absolute bottom-0 left-0 right-0 p-3 border-t border-gray-100 bg-white">
+                <a href="/" target="_blank" class="flex items-center gap-3 px-4 py-2.5 text-gray-600 hover:bg-gray-50 rounded-xl text-sm">
+                    <span class="material-symbols-outlined">open_in_new</span>
+                    <span>View Portfolio</span>
+                </a>
+                <button onclick="logout()" class="w-full flex items-center gap-3 px-4 py-2.5 text-red-500 hover:bg-red-50 rounded-xl text-sm mt-1">
+                    <span class="material-symbols-outlined">logout</span>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content min-h-screen md:p-6 p-4 pt-20 md:pt-6">
+            <!-- Header -->
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <h1 id="page-title" class="text-2xl font-bold text-gray-900">Dashboard</h1>
+                    <p id="page-subtitle" class="text-gray-500 text-sm mt-1">Welcome back, Admin</p>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span class="text-sm text-gray-400 hidden sm:block" id="current-date"></span>
+                    <div class="w-10 h-10 bg-gradient-to-br from-primary to-primary-dark rounded-xl flex items-center justify-center shadow-md">
+                        <span class="text-white font-bold">A</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Dashboard Section -->
+            <div id="section-dashboard" class="section-content">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                    <div class="stat-card rounded-xl p-5 border border-gray-100 card-hover">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-medium text-gray-400 uppercase tracking-wider">Total Visits</p>
+                                <p class="text-3xl font-bold text-gray-900 mt-1" id="stat-visits">0</p>
+                            </div>
+                            <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
+                                <span class="material-symbols-outlined text-blue-500">visibility</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-card rounded-xl p-5 border border-gray-100 card-hover">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-medium text-gray-400 uppercase tracking-wider">Today</p>
+                                <p class="text-3xl font-bold text-gray-900 mt-1" id="stat-today">0</p>
+                            </div>
+                            <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
+                                <span class="material-symbols-outlined text-green-500">trending_up</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-card rounded-xl p-5 border border-gray-100 card-hover">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-medium text-gray-400 uppercase tracking-wider">Messages</p>
+                                <p class="text-3xl font-bold text-gray-900 mt-1" id="stat-messages">0</p>
+                            </div>
+                            <div class="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center">
+                                <span class="material-symbols-outlined text-amber-500">mail</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-card rounded-xl p-5 border border-gray-100 card-hover">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-medium text-gray-400 uppercase tracking-wider">Unread</p>
+                                <p class="text-3xl font-bold text-gray-900 mt-1" id="stat-unread">0</p>
+                            </div>
+                            <div class="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center">
+                                <span class="material-symbols-outlined text-red-500">mark_email_unread</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="grid lg:grid-cols-2 gap-6">
+                    <div class="bg-white rounded-xl p-6 border border-gray-100">
+                        <h3 class="font-semibold text-gray-900 mb-4">Recent Messages</h3>
+                        <div id="recent-messages" class="space-y-3">
+                            <p class="text-gray-400 text-center py-8 text-sm">No messages yet</p>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl p-6 border border-gray-100">
+                        <h3 class="font-semibold text-gray-900 mb-4">Quick Actions</h3>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button onclick="showSection('projects'); setTimeout(showAddProjectModal, 100)" class="p-4 bg-primary/5 rounded-xl hover:bg-primary/10 transition text-left">
+                                <span class="material-symbols-outlined text-primary">add_circle</span>
+                                <p class="text-sm font-medium text-gray-900 mt-2">Add Project</p>
+                            </button>
+                            <button onclick="showSection('skills'); setTimeout(showAddSkillModal, 100)" class="p-4 bg-primary/5 rounded-xl hover:bg-primary/10 transition text-left">
+                                <span class="material-symbols-outlined text-primary">add_circle</span>
+                                <p class="text-sm font-medium text-gray-900 mt-2">Add Skill</p>
+                            </button>
+                            <button onclick="showSection('services'); setTimeout(showAddServiceModal, 100)" class="p-4 bg-primary/5 rounded-xl hover:bg-primary/10 transition text-left">
+                                <span class="material-symbols-outlined text-primary">add_circle</span>
+                                <p class="text-sm font-medium text-gray-900 mt-2">Add Service</p>
+                            </button>
+                            <button onclick="showSection('styles')" class="p-4 bg-primary/5 rounded-xl hover:bg-primary/10 transition text-left">
+                                <span class="material-symbols-outlined text-primary">palette</span>
+                                <p class="text-sm font-medium text-gray-900 mt-2">Edit Styles</p>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Content Section -->
+            <div id="section-content" class="section-content hidden">
+                <div class="bg-white rounded-xl border border-gray-100 overflow-hidden">
+                    <div class="p-5 border-b border-gray-100 flex items-center justify-between">
+                        <h3 class="font-semibold text-gray-900">Portfolio Sections</h3>
+                    </div>
+                    <div id="sections-list" class="divide-y divide-gray-50"></div>
+                </div>
+            </div>
+            
+            <!-- Projects Section -->
+            <div id="section-projects" class="section-content hidden">
+                <div class="bg-white rounded-xl border border-gray-100 overflow-hidden">
+                    <div class="p-5 border-b border-gray-100 flex items-center justify-between">
+                        <h3 class="font-semibold text-gray-900">Projects</h3>
+                        <button onclick="showAddProjectModal()" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-dark transition flex items-center gap-2">
+                            <span class="material-symbols-outlined text-lg">add</span>
+                            Add Project
+                        </button>
+                    </div>
+                    <div id="projects-list" class="divide-y divide-gray-50"></div>
+                </div>
+            </div>
+            
+            <!-- Skills Section -->
+            <div id="section-skills" class="section-content hidden">
+                <div class="bg-white rounded-xl border border-gray-100 overflow-hidden">
+                    <div class="p-5 border-b border-gray-100 flex items-center justify-between">
+                        <h3 class="font-semibold text-gray-900">Skills</h3>
+                        <button onclick="showAddSkillModal()" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-dark transition flex items-center gap-2">
+                            <span class="material-symbols-outlined text-lg">add</span>
+                            Add Skill
+                        </button>
+                    </div>
+                    <div id="skills-list" class="divide-y divide-gray-50"></div>
+                </div>
+            </div>
+            
+            <!-- Services Section -->
+            <div id="section-services" class="section-content hidden">
+                <div class="bg-white rounded-xl border border-gray-100 overflow-hidden">
+                    <div class="p-5 border-b border-gray-100 flex items-center justify-between">
+                        <h3 class="font-semibold text-gray-900">Services</h3>
+                        <button onclick="showAddServiceModal()" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-dark transition flex items-center gap-2">
+                            <span class="material-symbols-outlined text-lg">add</span>
+                            Add Service
+                        </button>
+                    </div>
+                    <div id="services-list" class="divide-y divide-gray-50"></div>
+                </div>
+            </div>
+            
+            <!-- Testimonials Section -->
+            <div id="section-testimonials" class="section-content hidden">
+                <div class="bg-white rounded-xl border border-gray-100 overflow-hidden">
+                    <div class="p-5 border-b border-gray-100 flex items-center justify-between">
+                        <h3 class="font-semibold text-gray-900">Testimonials</h3>
+                        <button onclick="showAddTestimonialModal()" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-dark transition flex items-center gap-2">
+                            <span class="material-symbols-outlined text-lg">add</span>
+                            Add Testimonial
+                        </button>
+                    </div>
+                    <div id="testimonials-list" class="divide-y divide-gray-50"></div>
+                </div>
+            </div>
+            
+            <!-- Contacts Section -->
+            <div id="section-contacts" class="section-content hidden">
+                <div class="bg-white rounded-xl border border-gray-100 overflow-hidden">
+                    <div class="p-5 border-b border-gray-100 flex items-center justify-between">
+                        <h3 class="font-semibold text-gray-900">Messages</h3>
+                        <button onclick="loadContacts()" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-200 transition flex items-center gap-2">
+                            <span class="material-symbols-outlined text-lg">refresh</span>
+                            Refresh
+                        </button>
+                    </div>
+                    <div id="contacts-list" class="divide-y divide-gray-50"></div>
+                </div>
+            </div>
+            
+            <!-- Analytics Section -->
+            <div id="section-analytics" class="section-content hidden">
+                <div class="bg-white rounded-xl border border-gray-100 overflow-hidden">
+                    <div class="p-5 border-b border-gray-100 flex items-center justify-between">
+                        <h3 class="font-semibold text-gray-900">Analytics</h3>
+                        <select id="analytics-period" onchange="loadAnalytics()" class="px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-primary">
+                            <option value="today">Today</option>
+                            <option value="week">This Week</option>
+                            <option value="month">This Month</option>
+                            <option value="all">All Time</option>
+                        </select>
+                    </div>
+                    <div id="analytics-list" class="divide-y divide-gray-50"></div>
+                </div>
+            </div>
+            
+            <!-- Styles Section -->
+            <div id="section-styles" class="section-content hidden">
+                <div class="grid lg:grid-cols-3 gap-6">
+                    <!-- Style Controls -->
+                    <div class="lg:col-span-1 space-y-4">
+                        <div class="bg-white rounded-xl border border-gray-100 p-5">
+                            <h3 class="font-semibold text-gray-900 mb-4">Colors</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="text-sm text-gray-600 mb-2 block">Primary Color</label>
+                                    <div class="flex items-center gap-3">
+                                        <input type="color" id="style-primary" value="#3C1B69" onchange="previewStyle()" class="color-swatch">
+                                        <input type="text" id="style-primary-hex" value="#3C1B69" onchange="syncColorFromHex('primary')" class="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm font-mono">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="text-sm text-gray-600 mb-2 block">Gold Accent</label>
+                                    <div class="flex items-center gap-3">
+                                        <input type="color" id="style-gold" value="#C9A96E" onchange="previewStyle()" class="color-swatch">
+                                        <input type="text" id="style-gold-hex" value="#C9A96E" onchange="syncColorFromHex('gold')" class="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm font-mono">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="text-sm text-gray-600 mb-2 block">Background</label>
+                                    <div class="flex items-center gap-3">
+                                        <input type="color" id="style-background" value="#3C1B69" onchange="previewStyle()" class="color-swatch">
+                                        <input type="text" id="style-background-hex" value="#3C1B69" onchange="syncColorFromHex('background')" class="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm font-mono">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="text-sm text-gray-600 mb-2 block">Text Color</label>
+                                    <div class="flex items-center gap-3">
+                                        <input type="color" id="style-text" value="#11071F" onchange="previewStyle()" class="color-swatch">
+                                        <input type="text" id="style-text-hex" value="#11071F" onchange="syncColorFromHex('text')" class="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm font-mono">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white rounded-xl border border-gray-100 p-5">
+                            <h3 class="font-semibold text-gray-900 mb-4">Typography</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="text-sm text-gray-600 mb-2 block">Heading Font</label>
+                                    <select id="style-heading-font" onchange="previewStyle()" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm">
+                                        <option value="Playfair Display">Playfair Display</option>
+                                        <option value="Georgia">Georgia</option>
+                                        <option value="Merriweather">Merriweather</option>
+                                        <option value="Lora">Lora</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="text-sm text-gray-600 mb-2 block">Body Font</label>
+                                    <select id="style-body-font" onchange="previewStyle()" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm">
+                                        <option value="Inter">Inter</option>
+                                        <option value="Roboto">Roboto</option>
+                                        <option value="Open Sans">Open Sans</option>
+                                        <option value="Lato">Lato</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white rounded-xl border border-gray-100 p-5">
+                            <h3 class="font-semibold text-gray-900 mb-4">Layout</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="text-sm text-gray-600 mb-2 block">Container Width: <span id="style-container-val">1200</span>px</label>
+                                    <input type="range" id="style-container" min="960" max="1440" value="1200" oninput="document.getElementById('style-container-val').textContent=this.value; previewStyle()" class="w-full">
+                                </div>
+                                <div>
+                                    <label class="text-sm text-gray-600 mb-2 block">Section Padding: <span id="style-padding-val">120</span>px</label>
+                                    <input type="range" id="style-padding" min="60" max="180" value="120" oninput="document.getElementById('style-padding-val').textContent=this.value; previewStyle()" class="w-full">
+                                </div>
+                                <div>
+                                    <label class="text-sm text-gray-600 mb-2 block">Border Radius: <span id="style-radius-val">12</span>px</label>
+                                    <input type="range" id="style-radius" min="0" max="24" value="12" oninput="document.getElementById('style-radius-val').textContent=this.value; previewStyle()" class="w-full">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white rounded-xl border border-gray-100 p-5">
+                            <h3 class="font-semibold text-gray-900 mb-4">Theme</h3>
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-gray-600">Dark Mode</span>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" id="style-dark-mode" onchange="previewStyle()" class="sr-only peer">
+                                        <div class="w-10 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+                                    </label>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-gray-600">Animations</span>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" id="style-animations" checked onchange="previewStyle()" class="sr-only peer">
+                                        <div class="w-10 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex gap-3">
+                            <button onclick="saveStyles()" class="flex-1 bg-primary text-white py-3 rounded-xl font-medium hover:bg-primary-dark transition">
+                                Save Changes
+                            </button>
+                            <button onclick="resetStyles()" class="px-4 py-3 border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition">
+                                Reset
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Live Preview -->
+                    <div class="lg:col-span-2">
+                        <div class="bg-white rounded-xl border border-gray-100 p-5">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-semibold text-gray-900">Live Preview</h3>
+                                <a href="/" target="_blank" class="text-sm text-primary hover:underline flex items-center gap-1">
+                                    <span class="material-symbols-outlined text-lg">open_in_new</span>
+                                    Open Full Preview
+                                </a>
+                            </div>
+                            <div class="bg-gray-100 rounded-xl overflow-hidden">
+                                <div class="bg-gray-200 px-4 py-2 flex items-center gap-2">
+                                    <div class="flex gap-1.5">
+                                        <div class="w-3 h-3 rounded-full bg-red-400"></div>
+                                        <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
+                                        <div class="w-3 h-3 rounded-full bg-green-400"></div>
+                                    </div>
+                                    <div class="flex-1 bg-white rounded-md px-3 py-1 text-xs text-gray-500 text-center">localhost:3001</div>
+                                </div>
+                                <iframe id="preview-frame" src="/" class="preview-frame"></iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Settings Section -->
+            <div id="section-settings" class="section-content hidden">
+                <div class="bg-white rounded-xl border border-gray-100 p-6">
+                    <h3 class="font-semibold text-gray-900 mb-6">Site Configuration</h3>
+                    <form id="settings-form" class="space-y-6 max-w-2xl">
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Site Title</label>
+                                <input type="text" id="config-site_title" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Contact Email</label>
+                                <input type="email" id="config-contact_email" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Location</label>
+                                <input type="text" id="config-location" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">LinkedIn URL</label>
+                                <input type="url" id="config-linkedin_url" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">GitHub URL</label>
+                                <input type="url" id="config-github_url" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent">
+                            </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">CV File Path</label>
+                            <input type="text" id="config-cv_file_path" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent">
+                        </div>
+                    </div>
+                    
+                    <!-- Hero Image Upload -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Hero Section Photo</label>
+                        <div class="flex items-center gap-4">
+                            <img id="admin-hero-preview" src="/uploads/hero-photo.jpg" class="w-20 h-24 rounded-xl object-cover bg-gray-100 border-2 border-gray-200" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2280%22 height=%2296%22><rect fill=%22%233C1B69%22 width=%2280%22 height=%2296%22/><text x=%2240%22 y=%2252%22 text-anchor=%22middle%22 fill=%22white%22 font-size=%2224%22 font-family=%22serif%22>SAK</text></svg>'">
+                            <div>
+                                <label for="admin-hero-upload" class="cursor-pointer inline-flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary-dark transition">
+                                    <span class="material-symbols-outlined text-lg">add_a_photo</span>
+                                    Upload Photo
+                                </label>
+                                <input type="file" id="admin-hero-upload" accept="image/*" class="hidden" onchange="adminUploadHero(this)">
+                                <p class="text-xs text-gray-400 mt-1">JPG, PNG or WebP. Max 5MB.</p>
+                            </div>
+                        </div>
+                    </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Site Description</label>
+                            <textarea id="config-site_description" rows="3" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent"></textarea>
+                        </div>
+                        <button type="submit" class="bg-primary text-white px-6 py-3 rounded-xl font-medium hover:bg-primary-dark transition">
+                            Save Settings
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Modal -->
+    <div id="modal" class="fixed inset-0 modal-backdrop flex items-center justify-center z-50 hidden p-4">
+        <div class="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div class="sticky top-0 bg-white px-6 py-4 border-b border-gray-100 flex items-center justify-between rounded-t-2xl">
+                <h3 id="modal-title" class="text-lg font-semibold text-gray-900">Modal</h3>
+                <button onclick="closeModal()" class="p-1 hover:bg-gray-100 rounded-lg transition">
+                    <span class="material-symbols-outlined text-gray-500">close</span>
+                </button>
+            </div>
+            <div id="modal-content" class="p-6"></div>
+        </div>
+    </div>
+    
+    <script>
+        // ============ TOAST NOTIFICATIONS ============
+        
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const bgColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500';
+            const icon = type === 'success' ? 'check_circle' : type === 'error' ? 'error' : 'info';
+            
+            toast.className = `toast ${bgColor} text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-2 min-w-[280px]`;
+            toast.innerHTML = `
+                <span class="material-symbols-outlined">${icon}</span>
+                <span class="text-sm font-medium">${message}</span>
+            `;
+            container.appendChild(toast);
+            
+            setTimeout(() => toast.remove(), 3000);
+        }
+        
+        // ============ AUTH ============
+        
+        let currentUser = null;
+        
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorEl = document.getElementById('login-error');
+            
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentUser = data.user;
+                    document.getElementById('login-modal').classList.add('hidden');
+                    document.getElementById('dashboard').classList.remove('hidden');
+                    showToast('Welcome back, ' + data.user.username + '!');
+                    loadDashboard();
+                } else {
+                    errorEl.textContent = data.error || 'Invalid credentials';
+                    errorEl.classList.remove('hidden');
+                }
+            } catch (error) {
+                errorEl.textContent = 'Connection error. Please try again.';
+                errorEl.classList.remove('hidden');
+            }
+        });
+        
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/auth/check');
+                const data = await response.json();
+                if (data.authenticated) {
+                    currentUser = data.user;
+                    document.getElementById('login-modal').classList.add('hidden');
+                    document.getElementById('dashboard').classList.remove('hidden');
+                    loadDashboard();
+                }
+            } catch (error) {
+                console.error('Auth check failed:', error);
+            }
+        }
+        
+        async function logout() {
+            await fetch('/api/auth/logout', { method: 'POST' });
+            currentUser = null;
+            document.getElementById('login-modal').classList.remove('hidden');
+            document.getElementById('dashboard').classList.add('hidden');
+        }
+        
+        // ============ SIDEBAR ============
+        
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('hidden');
+        }
+        
+        // ============ NAVIGATION ============
+        
+        function showSection(section) {
+            document.querySelectorAll('.section-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`section-${section}`).classList.remove('hidden');
+            
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.classList.remove('active');
+                el.classList.add('text-gray-600');
+            });
+            const activeBtn = document.querySelector(`[data-section="${section}"]`);
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+                activeBtn.classList.remove('text-gray-600');
+            }
+            
+            const titles = {
+                dashboard: ['Dashboard', 'Overview of your portfolio'],
+                content: ['Content', 'Manage portfolio sections'],
+                projects: ['Projects', 'Manage your projects'],
+                skills: ['Skills', 'Manage your skills'],
+                services: ['Services', 'Manage your services'],
+                testimonials: ['Testimonials', 'Manage client testimonials'],
+                contacts: ['Messages', 'View contact form submissions'],
+                styles: ['Style Editor', 'Customize portfolio appearance'],
+                analytics: ['Analytics', 'Track visitor activity'],
+                settings: ['Settings', 'Site configuration']
+            };
+            
+            document.getElementById('page-title').textContent = titles[section][0];
+            document.getElementById('page-subtitle').textContent = titles[section][1];
+            
+            // Close sidebar on mobile
+            if (window.innerWidth < 768) {
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.getElementById('sidebar-overlay');
+                sidebar.classList.remove('open');
+                overlay.classList.add('hidden');
+            }
+            
+            const loaders = { dashboard: loadDashboard, content: loadSections, projects: loadProjects, skills: loadSkills, services: loadServices, testimonials: loadTestimonials, contacts: loadContacts, styles: loadStyles, analytics: loadAnalytics, settings: loadSettings };
+            if (loaders[section]) loaders[section]();
+        }
+        
+        // ============ DATA LOADING ============
+        
+        async function loadDashboard() {
+            try {
+                const [analyticsRes, contactsRes] = await Promise.all([fetch('/api/analytics'), fetch('/api/contacts')]);
+                const analytics = await analyticsRes.json();
+                const contacts = await contactsRes.json();
+                
+                document.getElementById('stat-visits').textContent = analytics.stats.totalVisits;
+                document.getElementById('stat-today').textContent = analytics.stats.todayVisits;
+                document.getElementById('stat-messages').textContent = analytics.stats.totalContacts;
+                document.getElementById('stat-unread').textContent = analytics.stats.unreadContacts;
+                
+                // Update unread badge
+                const badge = document.getElementById('unread-badge');
+                if (analytics.stats.unreadContacts > 0) {
+                    badge.textContent = analytics.stats.unreadContacts;
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
+                
+                const container = document.getElementById('recent-messages');
+                if (contacts.length === 0) {
+                    container.innerHTML = '<p class="text-gray-400 text-center py-8 text-sm">No messages yet</p>';
+                } else {
+                    container.innerHTML = contacts.slice(0, 5).map(c => `
+                        <div class="flex items-start gap-3 p-3 hover:bg-gray-50 rounded-lg transition">
+                            <div class="w-9 h-9 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                                <span class="material-symbols-outlined text-primary text-lg">person</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-medium text-gray-900 text-sm">${escHtml(c.name)}</span>
+                                    ${!c.is_read ? '<span class="w-2 h-2 bg-red-500 rounded-full flex-shrink-0"></span>' : ''}
+                                </div>
+                                <p class="text-xs text-gray-500 truncate">${escHtml(c.message)}</p>
+                            </div>
+                            <span class="text-xs text-gray-400 flex-shrink-0">${timeAgo(c.created_at)}</span>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+            }
+        }
+        
+        async function loadSections() {
+            try {
+                const sections = await (await fetch('/api/sections')).json();
+                document.getElementById('sections-list').innerHTML = sections.map(s => `
+                    <div class="flex items-center justify-between p-4 hover:bg-gray-50 transition">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+                                <span class="material-symbols-outlined text-primary">article</span>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-gray-900 text-sm">${escHtml(s.section_key)}</h4>
+                                <p class="text-xs text-gray-500 truncate max-w-xs">${escHtml(s.title || 'No title')}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="editSection('${s.section_key}')" class="p-2 text-gray-400 hover:text-primary hover:bg-primary/5 rounded-lg transition">
+                                <span class="material-symbols-outlined text-lg">edit</span>
+                            </button>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" ${s.is_visible ? 'checked' : ''} onchange="toggleSectionVisibility('${s.section_key}', this.checked)" class="sr-only peer">
+                                <div class="w-9 h-5 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+                            </label>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) { console.error(error); }
+        }
+        
+        async function loadProjects() {
+            try {
+                const projects = await (await fetch('/api/projects')).json();
+                document.getElementById('projects-list').innerHTML = projects.map(p => `
+                    <div class="flex items-center justify-between p-4 hover:bg-gray-50 transition">
+                        <div class="flex items-center gap-4">
+                            <img src="${escAttr(p.image_url)}" alt="${escAttr(p.title)}" class="w-14 h-14 rounded-xl object-cover bg-gray-100" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2256%22 height=%2256%22><rect fill=%22%23f3f4f6%22 width=%2256%22 height=%2256%22/><text x=%2228%22 y=%2232%22 text-anchor=%22middle%22 fill=%22%239ca3af%22 font-size=%2212%22>No Img</text></svg>'">
+                            <div>
+                                <h4 class="font-medium text-gray-900 text-sm">${escHtml(p.title)}</h4>
+                                <p class="text-xs text-gray-500 truncate max-w-xs">${escHtml(p.description || '')}</p>
+                                <div class="flex gap-1.5 mt-1.5 flex-wrap">${(p.technologies || '').split(',').slice(0, 3).map(t => `<span class="px-2 py-0.5 bg-primary/10 text-primary text-xs rounded-md">${escHtml(t.trim())}</span>`).join('')}</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <button onclick="editProject(${p.id})" class="p-2 text-gray-400 hover:text-primary hover:bg-primary/5 rounded-lg transition">
+                                <span class="material-symbols-outlined text-lg">edit</span>
+                            </button>
+                            <button onclick="deleteItem('projects', ${p.id}, '${escAttr(p.title)}')" class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition">
+                                <span class="material-symbols-outlined text-lg">delete</span>
+                            </button>
+                        </div>
+                    </div>
+                `).join('') || '<p class="text-gray-400 text-center py-8 text-sm">No projects yet</p>';
+            } catch (error) { console.error(error); }
+        }
+        
+        async function loadSkills() {
+            try {
+                const skills = await (await fetch('/api/skills')).json();
+                document.getElementById('skills-list').innerHTML = skills.map(s => `
+                    <div class="flex items-center justify-between p-4 hover:bg-gray-50 transition">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                                <span class="material-symbols-outlined text-primary">${s.icon || 'school'}</span>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-gray-900 text-sm">${escHtml(s.name)}</h4>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="text-xs text-gray-500 capitalize">${s.category}</span>
+                                    <span class="text-xs text-gray-300">•</span>
+                                    <div class="w-20 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                                        <div class="h-full bg-primary rounded-full" style="width:${s.proficiency}%"></div>
+                                    </div>
+                                    <span class="text-xs text-gray-500">${s.proficiency}%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <button onclick="editSkill(${s.id})" class="p-2 text-gray-400 hover:text-primary hover:bg-primary/5 rounded-lg transition">
+                                <span class="material-symbols-outlined text-lg">edit</span>
+                            </button>
+                            <button onclick="deleteItem('skills', ${s.id}, '${escAttr(s.name)}')" class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition">
+                                <span class="material-symbols-outlined text-lg">delete</span>
+                            </button>
+                        </div>
+                    </div>
+                `).join('') || '<p class="text-gray-400 text-center py-8 text-sm">No skills yet</p>';
+            } catch (error) { console.error(error); }
+        }
+        
+        async function loadServices() {
+            try {
+                const services = await (await fetch('/api/services')).json();
+                document.getElementById('services-list').innerHTML = services.map(s => `
+                    <div class="flex items-center justify-between p-4 hover:bg-gray-50 transition">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                                <span class="material-symbols-outlined text-primary">${s.icon}</span>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-gray-900 text-sm">${escHtml(s.title)}</h4>
+                                <p class="text-xs text-gray-500 truncate max-w-xs">${escHtml(s.description || '')}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <button onclick="editService(${s.id})" class="p-2 text-gray-400 hover:text-primary hover:bg-primary/5 rounded-lg transition">
+                                <span class="material-symbols-outlined text-lg">edit</span>
+                            </button>
+                            <button onclick="deleteItem('services', ${s.id}, '${escAttr(s.title)}')" class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition">
+                                <span class="material-symbols-outlined text-lg">delete</span>
+                            </button>
+                        </div>
+                    </div>
+                `).join('') || '<p class="text-gray-400 text-center py-8 text-sm">No services yet</p>';
+            } catch (error) { console.error(error); }
+        }
+        
+        async function loadTestimonials() {
+            try {
+                const testimonials = await (await fetch('/api/testimonials')).json();
+                document.getElementById('testimonials-list').innerHTML = testimonials.map(t => `
+                    <div class="flex items-start justify-between p-4 hover:bg-gray-50 transition">
+                        <div class="flex items-start gap-4">
+                            <img src="${escAttr(t.client_image)}" alt="" class="w-11 h-11 rounded-full object-cover bg-gray-100" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2244%22 height=%2244%22><rect fill=%22%23f3f4f6%22 width=%2244%22 height=%2244%22 rx=%2222%22/><text x=%2222%22 y=%2226%22 text-anchor=%22middle%22 fill=%22%239ca3af%22 font-size=%2214%22>${(t.client_name||'?')[0]}</text></svg>'">
+                            <div>
+                                <h4 class="font-medium text-gray-900 text-sm">${escHtml(t.client_name)}</h4>
+                                <p class="text-xs text-gray-500">${escHtml(t.client_title || '')}</p>
+                                <p class="text-sm text-gray-600 mt-1 italic line-clamp-2">"${escHtml(t.content)}"</p>
+                                <div class="flex gap-0.5 mt-1">${'★'.repeat(t.rating || 5).split('').map(() => '<span class="text-amber-400 text-xs">★</span>').join('')}</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-1 flex-shrink-0">
+                            <button onclick="editTestimonial(${t.id})" class="p-2 text-gray-400 hover:text-primary hover:bg-primary/5 rounded-lg transition">
+                                <span class="material-symbols-outlined text-lg">edit</span>
+                            </button>
+                            <button onclick="deleteItem('testimonials', ${t.id}, '${escAttr(t.client_name)}')" class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition">
+                                <span class="material-symbols-outlined text-lg">delete</span>
+                            </button>
+                        </div>
+                    </div>
+                `).join('') || '<p class="text-gray-400 text-center py-8 text-sm">No testimonials yet</p>';
+            } catch (error) { console.error(error); }
+        }
+        
+        async function loadContacts() {
+            try {
+                const contacts = await (await fetch('/api/contacts')).json();
+                document.getElementById('contacts-list').innerHTML = contacts.map(c => `
+                    <div class="p-4 hover:bg-gray-50 transition ${!c.is_read ? 'border-l-3 border-primary bg-primary/5' : ''}">
+                        <div class="flex items-start justify-between">
+                            <div class="flex items-start gap-3">
+                                <div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                                    <span class="material-symbols-outlined text-primary">person</span>
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <h4 class="font-medium text-gray-900 text-sm">${escHtml(c.name)}</h4>
+                                        ${!c.is_read ? '<span class="px-2 py-0.5 bg-primary text-white text-xs rounded-full">New</span>' : ''}
+                                    </div>
+                                    <p class="text-xs text-gray-500">${escHtml(c.email)}${c.phone ? ` · ${escHtml(c.phone)}` : ''}</p>
+                                    ${c.subject ? `<p class="text-xs text-gray-400 mt-1">Subject: ${escHtml(c.subject)}</p>` : ''}
+                                    <p class="text-sm text-gray-600 mt-2">${escHtml(c.message)}</p>
+                                    <p class="text-xs text-gray-400 mt-2">${new Date(c.created_at).toLocaleString()}</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-1 flex-shrink-0">
+                                ${!c.is_read ? `<button onclick="markAsRead(${c.id})" class="p-2 text-gray-400 hover:text-green-500 hover:bg-green-50 rounded-lg transition" title="Mark as read"><span class="material-symbols-outlined text-lg">check_circle</span></button>` : ''}
+                                <button onclick="deleteItem('contacts', ${c.id}, 'this message')" class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition"><span class="material-symbols-outlined text-lg">delete</span></button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('') || '<p class="text-gray-400 text-center py-8 text-sm">No messages yet</p>';
+            } catch (error) { console.error(error); }
+        }
+        
+        async function loadAnalytics() {
+            try {
+                const period = document.getElementById('analytics-period').value;
+                const data = await (await fetch(`/api/analytics?period=${period}`)).json();
+                document.getElementById('analytics-list').innerHTML = data.data.length > 0 ? data.data.map(a => `
+                    <div class="flex items-center gap-4 p-4 hover:bg-gray-50 transition">
+                        <div class="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center">
+                            <span class="material-symbols-outlined text-blue-500">${a.event_type === 'page_view' ? 'visibility' : a.event_type === 'contact_form' ? 'mail' : 'touch_app'}</span>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-medium text-gray-900 text-sm capitalize">${a.event_type.replace('_', ' ')}</h4>
+                            <p class="text-xs text-gray-500">${a.page_url || '/'}</p>
+                        </div>
+                        <span class="text-xs text-gray-400">${new Date(a.created_at).toLocaleString()}</span>
+                    </div>
+                `).join('') : '<p class="text-gray-400 text-center py-8 text-sm">No data for this period</p>';
+            } catch (error) { console.error(error); }
+        }
+        
+        async function loadStyles() {
+            try {
+                const styles = await (await fetch('/api/styles')).json();
+                const fields = ['primary', 'gold', 'background', 'text'];
+                fields.forEach(f => {
+                    const key = f + '_color';
+                    if (styles[key]) {
+                        document.getElementById('style-' + f).value = styles[key];
+                        document.getElementById('style-' + f + '-hex').value = styles[key];
+                    }
+                });
+                if (styles.heading_font) document.getElementById('style-heading-font').value = styles.heading_font;
+                if (styles.body_font) document.getElementById('style-body-font').value = styles.body_font;
+                if (styles.container_width) { document.getElementById('style-container').value = styles.container_width; document.getElementById('style-container-val').textContent = styles.container_width; }
+                if (styles.section_padding) { document.getElementById('style-padding').value = styles.section_padding; document.getElementById('style-padding-val').textContent = styles.section_padding; }
+                if (styles.card_border_radius) { document.getElementById('style-radius').value = styles.card_border_radius; document.getElementById('style-radius-val').textContent = styles.card_border_radius; }
+                if (styles.dark_mode === 'true') document.getElementById('style-dark-mode').checked = true;
+                if (styles.enable_animations !== 'false') document.getElementById('style-animations').checked = true;
+            } catch (error) { console.error(error); }
+        }
+        
+        async function loadSettings() {
+            try {
+                const config = await (await fetch('/api/config')).json();
+                Object.entries(config).forEach(([key, value]) => {
+                    const el = document.getElementById('config-' + key);
+                    if (el) el.value = value || '';
+                });
+            } catch (error) { console.error(error); }
+        }
+        
+        async function adminUploadHero(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const formData = new FormData();
+            formData.append('image', file);
+            try {
+                const response = await fetch('/api/upload', { method: 'POST', body: formData });
+                const result = await response.json();
+                if (result.success) {
+                    document.getElementById('admin-hero-preview').src = result.url + '?t=' + Date.now();
+                    await fetch('/api/config', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ hero_image_url: result.url })
+                    });
+                    showToast('Hero photo uploaded!');
+                } else {
+                    showToast('Upload failed', 'error');
+                }
+            } catch (err) {
+                showToast('Upload failed', 'error');
+            }
+            input.value = '';
+        }
+        
+        // ============ CRUD ============
+        
+        async function toggleSectionVisibility(key, visible) {
+            await fetch(`/api/sections/${key}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ is_visible: visible ? 1 : 0 }) });
+            showToast('Section updated');
+        }
+        
+        async function deleteItem(type, id, name) {
+            if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
+            await fetch(`/api/${type}/${id}`, { method: 'DELETE' });
+            showToast('Deleted successfully');
+            loaders = { projects: loadProjects, skills: loadSkills, services: loadServices, testimonials: loadTestimonials, contacts: loadContacts };
+            if (loaders[type]) loaders[type]();
+            if (type === 'contacts') loadDashboard();
+        }
+        
+        async function markAsRead(id) {
+            await fetch(`/api/contacts/${id}/read`, { method: 'PUT' });
+            loadContacts();
+            loadDashboard();
+        }
+        
+        // ============ MODALS ============
+        
+        function showModal(title, content) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-content').innerHTML = content;
+            document.getElementById('modal').classList.remove('hidden');
+        }
+        
+        function closeModal() { document.getElementById('modal').classList.add('hidden'); }
+        
+        function editSection(key) {
+            fetch(`/api/sections/${key}`).then(r => r.json()).then(s => {
+                showModal('Edit Section: ' + key, `
+                    <form id="edit-section-form" class="space-y-4">
+                        <input type="hidden" name="section_key" value="${key}">
+                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Title</label><input type="text" name="title" value="${escAttr(s.title || '')}" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm"></div>
+                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Subtitle</label><input type="text" name="subtitle" value="${escAttr(s.subtitle || '')}" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm"></div>
+                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Content</label><textarea name="content" rows="4" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm">${escHtml(s.content || '')}</textarea></div>
+                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Image URL</label><input type="url" name="image_url" value="${escAttr(s.image_url || '')}" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm"></div>
+                        <button type="submit" class="w-full bg-primary text-white py-2.5 rounded-xl font-medium hover:bg-primary-dark transition">Save Changes</button>
+                    </form>
+                `);
+                document.getElementById('edit-section-form').onsubmit = async (e) => {
+                    e.preventDefault();
+                    const fd = new FormData(e.target);
+                    await fetch(`/api/sections/${key}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.fromEntries(fd)) });
+                    closeModal(); loadSections(); showToast('Section updated');
+                };
+            });
+        }
+        
+        function showAddProjectModal() {
+            showModal('Add Project', `
+                <form id="add-project-form" class="space-y-4">
+                    <div><label class="block text-sm font-medium text-gray-700 mb-1">Title *</label><input type="text" name="title" required class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm"></div>
+                    <div><label class="block text-sm font-medium text-gray-700 mb-1">Description *</label><textarea name="description" required rows="3" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm"></textarea></div>
+                    <div><label class="block text-sm font-medium text-gray-700 mb-1">Technologies (comma separated)</label><input type="text" name="technologies" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm" placeholder="React, Node.js, Tailwind"></div>
+                    <div><label class="block text-sm font-medium text-gray-700 mb-1">Image URL</label><input type="url" name="image_url" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm"></div>
+                    <div><label class="block text-sm font-medium text-gray-700 mb-1">Project URL</label><input type="url" name="project_url" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm"></div>
+                    <label class="flex items-center gap-2"><input type="checkbox" name="is_featured" class="rounded"><span class="text-sm text-gray-700">Featured Project</span></label>
+                    <button type="submit" class="w-full bg-primary text-white py-2.5 rounded-xl font-medium hover:bg-primary-dark transition">Add Project</button>
+                </form>
+            `);
+            document.getElementById('add-project-form').onsubmit = async (e) => {
+                e.preventDefault();
+                const fd = new FormData(e.target);
+                const data = Object.fromEntries(fd);
+                data.is_featured = fd.has('is_featured') ? 1 : 0;
+                await fetch('/api/projects', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+                closeModal(); loadProjects(); showToast('Project added');
+            };
+        }
+        
+        function editProject(id) {
+            fetch(`/api/projects/${id}`).then(r => r.json()).then(p => {
+                showModal('Edit Project', `
+                    <form id="edit-project-form" class="space-y-4">
+                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Title *</label><input type="text" name="title" value="${escAttr(p.title)}" required class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm"></div>
+                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Description *</label><textarea name="description" required rows="3" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm">${escHtml(p.description || '')}</textarea></div>
+                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Technologies</label><input type="text" name="technologies" value="${escAttr(p.technologies || '')}" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm"></div>
+                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Image URL</label><input type="url" name="image_url" value="${escAttr(p.image_url || '')}" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm"></div>
+                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Project URL</label><input type="url" name="project_url" value="${escAttr(p.project_url || '')}" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm"></div>
+                        <label class="flex items-center gap-2"><input type="checkbox" name="is_featured" ${p.is_featured ? 'checked' : ''} class="rounded"><span class="text-sm text-gray-700">Featured</span></label>
+                        <button type="submit" class="w-full bg-primary text-white py-2.5 rounded-xl font-medium hover:bg-primary-dark transition">Save Changes</button>
+                    </form>
+                `);
+                document.getElementById('edit-project-form').onsubmit = async (e) => {
+                    e.preventDefault();
+                    const fd = new FormData(e.target);
+                    const data = Object.fromEntries(fd);
+                    data.is_featured = fd.has('is_featured') ? 1 : 0;
+                    await fetch(`/api/projects/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+                    closeModal(); loadProjects(); showToast('Project updated');
+                };
+            });
+        }
+        
+        function showAddSkillModal() {
+            showModal('Add Skill', `
+                <form id="add-skill-form" class="space-y-4">
+                    <div><label class="block text-sm font-medium text-gray-700 mb-1">Name *</label><input type="text" name="name" required class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm"></div>
+                    <div><label class="block text-sm font-medium text-gray-700 mb-1">Category *</label><select name="category" required class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm"><option value="technical">Technical</option><option value="islamic">Islamic Sciences</option></select></div>
+                    <div><label class="block text-sm font-medium text-gray-700 mb-1">Proficiency (0-100) *</label><input type="number" name="proficiency" min="0" max="100" required class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm"></div>
+                    <div><label class="block text-sm font-medium text-gray-700 mb-1">Icon</label><input type="text" name="icon" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm" placeholder="school"></div>
+                    <button type="submit" class="w-full bg-primary text-white py-2.5 rounded-xl font-medium hover:bg-primary-dark transition">Add Skill</button>
+                </form>
+            `);
+            document.getElementById('add-skill-form').onsubmit = async (e) => {
+                e.preventDefault();
+                await fetch('/api/skills', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.fromEntries(new FormData(e.target))) });
+                closeModal(); loadSkills(); showToast('Skill added');
+            };
+        }
+        
+        function editSkill(id) {
+            fetch('/api/skills').then(r => r.json()).then(skills => {
+                const s = skills.find(sk => sk.id === id);
+                if (!s) return;
+                showModal('Edit Skill', `
+                    <form id="edit-skill-form" class="space-y-4">
+                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Name *</label><input type="text" name="name" value="${escAttr(s.name)}" required class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm"></div>
+                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Category *</label><select name="category" required class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm"><option value="technical" ${s.category==='technical'?'selected':''}>Technical</option><option value="islamic" ${s.category==='islamic'?'selected':''}>Islamic Sciences</option></select></div>
+                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Proficiency (0-100) *</label><input type="number" name="proficiency" min="0" max="100" value="${s.proficiency}" required class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm"></div>
+                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Icon</label><input type="text" name="icon" value="${escAttr(s.icon || '')}" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm"></div>
+                        <button type="submit" class="w-full bg-primary text-white py-2.5 rounded-xl font-medium hover:bg-primary-dark transition">Save Changes</button>
+                    </form>
+                `);
+                document.getElementById('edit-skill-form').onsubmit = async (e) => {
+                    e.preventDefault();
+                    await fetch(`/api/skills/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.fromEntries(new FormData(e.target))) });
+                    closeModal(); loadSkills(); showToast('Skill updated');
+                };
+            });
+        }
+        
+        function showAddServiceModal() {
+            showModal('Add Service', `
+                <form id="add-service-form" class="space-y-4">
+                    <div><label class="block text-sm font-medium text-gray-700 mb-1">Title *</label><input type="text" name="title" required class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm"></div>
+                    <div><label class="block text-sm font-medium text-gray-700 mb-1">Description *</label><textarea name="description" required rows="3" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm"></textarea></div>
+                    <div><label class="block text-sm font-medium text-gray-700 mb-1">Icon *</label><input type="text" name="icon" required class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm" placeholder="language"></div>
+                    <button type="submit" class="w-full bg-primary text-white py-2.5 rounded-xl font-medium hover:bg-primary-dark transition">Add Service</button>
+                </form>
+            `);
+            document.getElementById('add-service-form').onsubmit = async (e) => {
+                e.preventDefault();
+                await fetch('/api/services', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.fromEntries(new FormData(e.target))) });
+                closeModal(); loadServices(); showToast('Service added');
+            };
+        }
+        
+        function editService(id) {
+            fetch('/api/services').then(r => r.json()).then(services => {
+                const s = services.find(sv => sv.id === id);
+                if (!s) return;
+                showModal('Edit Service', `
+                    <form id="edit-service-form" class="space-y-4">
+                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Title *</label><input type="text" name="title" value="${escAttr(s.title)}" required class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm"></div>
+                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Description *</label><textarea name="description" required rows="3" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm">${escHtml(s.description || '')}</textarea></div>
+                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Icon *</label><input type="text" name="icon" value="${escAttr(s.icon)}" required class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm"></div>
+                        <button type="submit" class="w-full bg-primary text-white py-2.5 rounded-xl font-medium hover:bg-primary-dark transition">Save Changes</button>
+                    </form>
+                `);
+                document.getElementById('edit-service-form').onsubmit = async (e) => {
+                    e.preventDefault();
+                    await fetch(`/api/services/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.fromEntries(new FormData(e.target))) });
+                    closeModal(); loadServices(); showToast('Service updated');
+                };
+            });
+        }
+        
+        function showAddTestimonialModal() {
+            showModal('Add Testimonial', `
+                <form id="add-testimonial-form" class="space-y-4">
+                    <div><label class="block text-sm font-medium text-gray-700 mb-1">Client Name *</label><input type="text" name="client_name" required class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm"></div>
+                    <div><label class="block text-sm font-medium text-gray-700 mb-1">Client Title</label><input type="text" name="client_title" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm"></div>
+                    <div><label class="block text-sm font-medium text-gray-700 mb-1">Client Image URL</label><input type="url" name="client_image" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm"></div>
+                    <div><label class="block text-sm font-medium text-gray-700 mb-1">Content *</label><textarea name="content" required rows="4" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm"></textarea></div>
+                    <div><label class="block text-sm font-medium text-gray-700 mb-1">Rating (1-5)</label><input type="number" name="rating" min="1" max="5" value="5" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm"></div>
+                    <button type="submit" class="w-full bg-primary text-white py-2.5 rounded-xl font-medium hover:bg-primary-dark transition">Add Testimonial</button>
+                </form>
+            `);
+            document.getElementById('add-testimonial-form').onsubmit = async (e) => {
+                e.preventDefault();
+                await fetch('/api/testimonials', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.fromEntries(new FormData(e.target))) });
+                closeModal(); loadTestimonials(); showToast('Testimonial added');
+            };
+        }
+        
+        function editTestimonial(id) {
+            fetch('/api/testimonials').then(r => r.json()).then(testimonials => {
+                const t = testimonials.find(ti => ti.id === id);
+                if (!t) return;
+                showModal('Edit Testimonial', `
+                    <form id="edit-testimonial-form" class="space-y-4">
+                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Client Name *</label><input type="text" name="client_name" value="${escAttr(t.client_name)}" required class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm"></div>
+                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Client Title</label><input type="text" name="client_title" value="${escAttr(t.client_title || '')}" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm"></div>
+                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Client Image URL</label><input type="url" name="client_image" value="${escAttr(t.client_image || '')}" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm"></div>
+                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Content *</label><textarea name="content" required rows="4" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm">${escHtml(t.content)}</textarea></div>
+                        <div><label class="block text-sm font-medium text-gray-700 mb-1">Rating (1-5)</label><input type="number" name="rating" min="1" max="5" value="${t.rating || 5}" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm"></div>
+                        <button type="submit" class="w-full bg-primary text-white py-2.5 rounded-xl font-medium hover:bg-primary-dark transition">Save Changes</button>
+                    </form>
+                `);
+                document.getElementById('edit-testimonial-form').onsubmit = async (e) => {
+                    e.preventDefault();
+                    await fetch(`/api/testimonials/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.fromEntries(new FormData(e.target))) });
+                    closeModal(); loadTestimonials(); showToast('Testimonial updated');
+                };
+            });
+        }
+        
+        // ============ STYLES ============
+        
+        function syncColorFromHex(type) {
+            const hex = document.getElementById('style-' + type + '-hex').value;
+            if (/^#[0-9A-Fa-f]{6}$/.test(hex)) {
+                document.getElementById('style-' + type).value = hex;
+                previewStyle();
+            }
+        }
+        
+        function previewStyle() {
+            const frame = document.getElementById('preview-frame');
+            if (frame && frame.contentWindow) {
+                const styles = getStyleValues();
+                frame.contentWindow.postMessage({ type: 'preview-styles', styles }, '*');
+            }
+        }
+        
+        function getStyleValues() {
+            return {
+                primary_color: document.getElementById('style-primary').value,
+                gold_color: document.getElementById('style-gold').value,
+                background_color: document.getElementById('style-background').value,
+                text_color: document.getElementById('style-text').value,
+                heading_font: document.getElementById('style-heading-font').value,
+                body_font: document.getElementById('style-body-font').value,
+                container_width: document.getElementById('style-container').value,
+                section_padding: document.getElementById('style-padding').value,
+                card_border_radius: document.getElementById('style-radius').value,
+                dark_mode: document.getElementById('style-dark-mode').checked.toString(),
+                enable_animations: document.getElementById('style-animations').checked.toString()
+            };
+        }
+        
+        async function saveStyles() {
+            try {
+                await fetch('/api/styles', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(getStyleValues()) });
+                showToast('Styles saved successfully!');
+            } catch (error) { showToast('Error saving styles', 'error'); }
+        }
+        
+        async function resetStyles() {
+            if (!confirm('Reset all styles to default?')) return;
+            const defaults = { primary_color: '#3C1B69', gold_color: '#C9A96E', background_color: '#3C1B69', text_color: '#11071F', heading_font: 'Playfair Display', body_font: 'Inter', base_font_size: '16', container_width: '1200', section_padding: '120', card_border_radius: '12', dark_mode: 'false', enable_animations: 'true' };
+            await fetch('/api/styles', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(defaults) });
+            loadStyles(); showToast('Styles reset to default');
+        }
+        
+        async function saveSettings() {
+            const form = document.getElementById('settings-form');
+            const fd = new FormData(form);
+            const config = {};
+            document.querySelectorAll('#settings-form input, #settings-form textarea').forEach(el => {
+                if (el.id.startsWith('config-')) {
+                    config[el.id.replace('config-', '')] = el.value;
+                }
+            });
+            await fetch('/api/config', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(config) });
+            showToast('Settings saved');
+        }
+        
+        document.getElementById('settings-form').addEventListener('submit', (e) => { e.preventDefault(); saveSettings(); });
+        
+        // ============ HELPERS ============
+        
+        function escHtml(s) { const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
+        function escAttr(s) { return (s || '').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
+        function timeAgo(dateStr) {
+            const diff = Date.now() - new Date(dateStr).getTime();
+            const mins = Math.floor(diff / 60000);
+            if (mins < 1) return 'now';
+            if (mins < 60) return mins + 'm ago';
+            const hrs = Math.floor(mins / 60);
+            if (hrs < 24) return hrs + 'h ago';
+            const days = Math.floor(hrs / 24);
+            return days + 'd ago';
+        }
+        
+        // Sync color pickers with hex inputs
+        document.querySelectorAll('input[type="color"]').forEach(input => {
+            input.addEventListener('input', () => {
+                const hexInput = document.getElementById(input.id + '-hex');
+                if (hexInput) hexInput.value = input.value;
+            });
+        });
+        
+        document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        
+        checkAuth();
+    </script>
+    <script>window.EDITOR_ON_ADMIN = true;</script>
+    <script src="/editor.js"></script>
+</body>
+</html>

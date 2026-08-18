@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects - Sulyman Abdulrafiu Kehinde</title>
+    <meta name="description" content="Explore projects by Sulyman Abdulrafiu Kehinde - Islamic educator, web designer, and curriculum developer.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS (compiled locally -- no CDN dependency) -->
+    <link rel="stylesheet" href="/tailwind.css">
+    <style>
+        :root {
+            --primary: #3C1B69;
+            --primary-dark: #2A1350;
+            --primary-light: #5B3A8F;
+            --gold: #C9A96E;
+            --gold-dark: #B8963F;
+            --hero-title-color: #FFFFFF;
+            --hero-accent-color: #C9A96E;
+            --background: #3C1B69;
+            --card: #FFFFFF;
+            --text: #11071F;
+            --accent: #F5EDE3;
+        }
+        body { font-family: 'Inter', sans-serif; background: var(--background); color: var(--text); }
+        .font-heading { font-family: 'Playfair Display', serif; }
+        .glass { background: rgba(255,255,255,0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.3); }
+        .pattern-bg {
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%233C1B69' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        #scroll-progress { position: fixed; top: 0; left: 0; height: 3px; background: linear-gradient(90deg, var(--primary), var(--gold)); z-index: 9999; transition: width 0.1s ease-out; }
+        .btn-primary { background-color: var(--primary); color: white; transition: all 0.3s ease; }
+        .btn-primary:hover { background-color: var(--primary-dark); transform: translateY(-2px); }
+        .btn-outline { background-color: transparent; color: var(--primary); border: 2px solid var(--primary); transition: all 0.3s ease; }
+        .btn-outline:hover { background-color: var(--accent); }
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(60,27,105,0.1); }
+        .fade-in { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+        .fade-in.visible { opacity: 1; transform: translateY(0); }
+        .project-preview-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: #f3f4f6;
+            pointer-events: none;
+        }
+        .filter-btn.active { background: var(--primary); color: white; }
+        .filter-btn { transition: all 0.2s ease; }
+        .filter-btn:hover:not(.active) { background: var(--accent); color: var(--primary); }
+    </style>
+    <link rel="stylesheet" href="/editor.css">
+</head>
+<body class="pattern-bg min-h-screen">
+    <div id="scroll-progress"></div>
+
+    <!-- Navigation -->
+    <header id="navbar" class="fixed top-0 left-0 right-0 z-50 glass transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <a href="/" class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-lg">SAK</span>
+                    </div>
+                    <span class="font-heading text-xl font-bold text-primary hidden sm:block">Sulyman.A.K</span>
+                </a>
+                <nav class="hidden md:flex items-center gap-8">
+                    <a href="/" class="relative text-sm font-medium text-gray-700 hover:text-primary transition">Home</a>
+                    <a href="/#about" class="relative text-sm font-medium text-gray-700 hover:text-primary transition">About</a>
+                    <a href="/#skills" class="relative text-sm font-medium text-gray-700 hover:text-primary transition">Skills</a>
+                    <a href="/projects" class="relative text-sm font-medium text-primary transition nav-active">Projects</a>
+                    <a href="/#services" class="relative text-sm font-medium text-gray-700 hover:text-primary transition">Services</a>
+                    <a href="/#contact" class="relative text-sm font-medium text-gray-700 hover:text-primary transition">Contact</a>
+                </nav>
+                <a href="/#contact" class="hidden md:flex btn-primary px-6 py-2 rounded-lg text-sm font-medium items-center gap-2">
+                    Contact Me
+                    <span class="material-symbols-outlined text-lg">arrow_forward</span>
+                </a>
+                <button class="md:hidden text-gray-700" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')">
+                    <span class="material-symbols-outlined text-2xl">menu</span>
+                </button>
+            </div>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t">
+            <nav class="flex flex-col py-4">
+                <a href="/" class="px-6 py-3 text-gray-700 hover:bg-gray-50 hover:text-primary">Home</a>
+                <a href="/#about" class="px-6 py-3 text-gray-700 hover:bg-gray-50 hover:text-primary">About</a>
+                <a href="/#skills" class="px-6 py-3 text-gray-700 hover:bg-gray-50 hover:text-primary">Skills</a>
+                <a href="/projects" class="px-6 py-3 text-primary font-medium">Projects</a>
+                <a href="/#services" class="px-6 py-3 text-gray-700 hover:bg-gray-50 hover:text-primary">Services</a>
+                <a href="/#contact" class="px-6 py-3 text-gray-700 hover:bg-gray-50 hover:text-primary">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Banner -->
+    <section class="pt-32 pb-16 bg-primary pattern-bg">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div class="text-center lg:text-left">
+                    <span class="inline-flex items-center gap-2 bg-white/10 text-white/80 px-4 py-2 rounded-full text-sm font-medium mb-6 border border-white/20">
+                        <span class="material-symbols-outlined text-lg">work</span>
+                        <span id="content-projects-badge">Portfolio Showcase</span>
+                    </span>
+                    <h1 id="content-projects-title" class="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">Featured Projects</h1>
+                    <p id="content-projects-subtitle" class="text-lg text-white/70 max-w-2xl mx-auto lg:mx-0">A synthesis of academic rigor and creative digital mastery — from Islamic curriculum design to modern web development.</p>
+                </div>
+                <!-- Photo + badges block (same editor controls as the home page) -->
+                <div class="hidden lg:flex justify-center items-center">
+                    <div id="hero-photo-block" class="relative">
+                        <div class="absolute -inset-6 bg-gradient-to-br from-gold/15 to-white/10 rounded-3xl animate-pulse"></div>
+                        <div class="absolute -inset-12 bg-gradient-to-br from-gold/10 to-white/5 rounded-3xl"></div>
+                        <div id="hero-frame" class="relative w-80 h-96 rounded-3xl overflow-hidden border-4 border-white shadow-2xl group">
+                            <img id="hero-image" src="/uploads/hero-photo.jpg"
+                                 alt="Sulyman Abdulrafiu Kehinde"
+                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                                 onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22320%22 height=%22384%22><defs><linearGradient id=%22g%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%221%22><stop offset=%220%25%22 stop-color=%22%233C1B69%22/><stop offset=%22100%25%22 stop-color=%22%235B3A8F%22/></linearGradient></defs><rect fill=%22url(%23g)%22 width=%22320%22 height=%22384%22/><text x=%22160%22 y=%22180%22 text-anchor=%22middle%22 fill=%22white%22 font-size=%2272%22 font-family=%22serif%22 font-weight=%22bold%22>SAK</text><text x=%22160%22 y=%22230%22 text-anchor=%22middle%22 fill=%22rgba(255,255,255,0.6)%22 font-size=%2214%22 font-family=%22sans-serif%22>Upload your photo</text></svg>'">
+                            <div class="absolute inset-0 bg-gradient-to-t from-primary/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                            <div id="edit-photo-hint" class="hidden absolute inset-x-0 bottom-4 mx-auto w-fit items-center gap-2 z-10">
+                                <button type="button" onclick="document.getElementById('hero-upload').click()" class="bg-primary text-white text-xs font-medium px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 cursor-pointer hover:bg-primary-dark transition">
+                                    <span class="material-symbols-outlined text-sm">add_a_photo</span>
+                                    Change photo
+                                </button>
+                                <button type="button" onclick="removeHeroPhoto()" class="bg-red-600 text-white text-xs font-medium px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 cursor-pointer hover:bg-red-700 transition">
+                                    <span class="material-symbols-outlined text-sm">delete</span>
+                                    Remove photo
+                                </button>
+                            </div>
+                            <div id="upload-prompt" class="absolute bottom-4 left-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                <label for="hero-upload" class="cursor-pointer w-full bg-white/90 backdrop-blur-sm text-primary px-4 py-2.5 rounded-xl text-sm font-medium flex items-center justify-center gap-2 hover:bg-white transition shadow-lg">
+                                    <span class="material-symbols-outlined text-lg">add_a_photo</span>
+                                    Upload Photo
+                                </label>
+                                <input type="file" id="hero-upload" accept="image/*" class="hidden" onchange="uploadHeroPhoto(this)">
+                            </div>
+                        </div>
+                        <div id="hero-badges" class="hero-badges-container absolute inset-0"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Filter Bar -->
+    <section class="sticky top-16 z-40 bg-white/90 backdrop-blur-md border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex items-center gap-3 overflow-x-auto pb-1">
+                <button onclick="filterProjects('all')" class="filter-btn active px-5 py-2 rounded-full text-sm font-medium border border-gray-200 whitespace-nowrap">All Projects</button>
+                <button onclick="filterProjects('web')" class="filter-btn px-5 py-2 rounded-full text-sm font-medium border border-gray-200 whitespace-nowrap">Web Development</button>
+                <button onclick="filterProjects('education')" class="filter-btn px-5 py-2 rounded-full text-sm font-medium border border-gray-200 whitespace-nowrap">Education</button>
+                <button onclick="filterProjects('design')" class="filter-btn px-5 py-2 rounded-full text-sm font-medium border border-gray-200 whitespace-nowrap">Design</button>
+                <button onclick="filterProjects('writing')" class="filter-btn px-5 py-2 rounded-full text-sm font-medium border border-gray-200 whitespace-nowrap">Writing & Content</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Grid -->
+    <section class="py-16">
+        <div class="max-w-7xl mx-auto px-6">
+            <div id="projects-count" class="text-purple-100 text-sm mb-8">Loading projects...</div>
+            <div id="projects-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Projects loaded dynamically -->
+            </div>
+            <div id="no-projects" class="hidden text-center py-20">
+                <span class="material-symbols-outlined text-6xl text-purple-200">folder_off</span>
+                <p class="text-purple-100 mt-4 text-lg">No projects found in this category.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 bg-primary-dark border-y border-gold/30">
+        <div class="max-w-4xl mx-auto px-6 text-center">
+            <h2 id="content-cta-title" class="font-heading text-3xl md:text-4xl font-bold text-white mb-6">Interested in Working Together?</h2>
+            <p id="content-cta-text" class="text-white/70 text-lg mb-8 max-w-2xl mx-auto">Whether you need a website, curriculum development, or educational consulting — let's create something impactful.</p>
+            <div class="flex flex-wrap justify-center gap-4">
+                <a href="/#contact" class="inline-flex items-center gap-2 bg-gold text-white px-8 py-3 rounded-lg font-medium hover:bg-gold-dark transition transform hover:-translate-y-0.5">
+                    <span id="content-cta-button">Start a Conversation</span>
+                    <span class="material-symbols-outlined">arrow_forward</span>
+                </a>
+                <a href="/" class="inline-flex items-center gap-2 border-2 border-white/30 text-white px-8 py-3 rounded-lg font-medium hover:bg-white/10 transition">
+                    Back to Portfolio
+                    <span class="material-symbols-outlined">arrow_back</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-16">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-8">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-lg">SAK</span>
+                    </div>
+                    <span class="font-heading text-xl font-bold">Sulyman.A.K</span>
+                </div>
+                <nav class="flex flex-wrap justify-center gap-6">
+                    <a href="/" class="text-gray-400 hover:text-white transition">Home</a>
+                    <a href="/#about" class="text-gray-400 hover:text-white transition">About</a>
+                    <a href="/#services" class="text-gray-400 hover:text-white transition">Services</a>
+                    <a href="/#contact" class="text-gray-400 hover:text-white transition">Contact</a>
+                </nav>
+                <div class="flex items-center gap-4">
+                    <a href="#" class="text-gray-400 hover:text-white transition"><span class="material-symbols-outlined">work</span></a>
+                    <a href="#" class="text-gray-400 hover:text-white transition"><span class="material-symbols-outlined">terminal</span></a>
+                    <a href="#" class="text-gray-400 hover:text-white transition"><span class="material-symbols-outlined">mail</span></a>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p id="content-footer-copyright" class="text-gray-400 text-sm">© 2024 Sulyman Abdulrafiu Kehinde. All rights reserved.</p>
+                <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="text-gray-400 hover:text-white transition flex items-center gap-2 text-sm">
+                    Back to Top
+                    <span class="material-symbols-outlined text-lg">arrow_upward</span>
+                </button>
+            </div>
+        </div>
+    </footer>    <script>
+        let allProjects = [];
+        let currentFilter = 'all';
+
+        async function loadProjects() {
+            try {
+                const res = await fetch('/api/projects');
+                allProjects = await res.json();
+                renderProjects();
+            } catch (err) {
+                console.error('Error loading projects:', err);
+                loadDefaultProjects();
+            }
+        }
+        
+        // Content fields for this page (used by the shared style editor)
+        window.PAGE_CONTENT_FIELDS = [
+            { key: 'projects_badge', label: 'Banner: badge', type: 'text', category: 'Banner', ids: ['content-projects-badge'] },
+            { key: 'projects_title', label: 'Banner: title', type: 'textarea', category: 'Banner', ids: ['content-projects-title'] },
+            { key: 'projects_subtitle', label: 'Banner: subtitle', type: 'textarea', category: 'Banner', ids: ['content-projects-subtitle'] },
+            { key: 'cta_title', label: 'CTA: heading', type: 'text', category: 'CTA', ids: ['content-cta-title'] },
+            { key: 'cta_text', label: 'CTA: text', type: 'textarea', category: 'CTA', ids: ['content-cta-text'] },
+            { key: 'cta_button', label: 'CTA: button text', type: 'text', category: 'CTA', ids: ['content-cta-button'] },
+            { key: 'footer_copyright', label: 'Footer: copyright', type: 'text', category: 'Footer', ids: ['content-footer-copyright'] }
+        ];
+
+        function filterProjects(category) {
+            currentFilter = category;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+                btn.classList.add('border-gray-200');
+            });
+            event.target.classList.add('active');
+            renderProjects();
+        }
+
+        function renderProjects() {
+            const container = document.getElementById('projects-grid');
+            const countEl = document.getElementById('projects-count');
+            const noProjects = document.getElementById('no-projects');
+
+            const filtered = currentFilter === 'all'
+                ? allProjects
+                : allProjects.filter(p => {
+                    const tech = (p.technologies || '').toLowerCase();
+                    const desc = (p.description || '').toLowerCase();
+                    const title = (p.title || '').toLowerCase();
+                    if (currentFilter === 'web') return tech.includes('react') || tech.includes('node') || tech.includes('html') || tech.includes('css') || tech.includes('tailwind') || tech.includes('next') || tech.includes('javascript');
+                    if (currentFilter === 'education') return desc.includes('curriculum') || desc.includes('educational') || desc.includes('academy') || title.toLowerCase().includes('curriculum') || title.toLowerCase().includes('academy');
+                    if (currentFilter === 'design') return tech.includes('figma') || desc.includes('design') || desc.includes('branding');
+                    if (currentFilter === 'writing') return desc.includes('textbook') || desc.includes('authored') || desc.includes('writing') || desc.includes('resource');
+                    return true;
+                });
+
+            countEl.textContent = `Showing ${filtered.length} project${filtered.length !== 1 ? 's' : ''}`;
+
+            if (filtered.length === 0) {
+                container.innerHTML = '';
+                noProjects.classList.remove('hidden');
+                return;
+            }
+
+            noProjects.classList.add('hidden');
+            container.innerHTML = filtered.map((project, index) => `
+                <div class="glass rounded-2xl overflow-hidden card-hover border border-accent fade-in group" data-category="${getProjectCategory(project)}" style="animation-delay: ${index * 0.1}s">
+                    <div class="h-56 bg-gray-100 relative overflow-hidden">
+                        ${project.project_url ? `
+                        <iframe src="${project.project_url.match(/^https?:\/\//) ? project.project_url : 'https://' + project.project_url}" class="w-full h-full border-none" sandbox="allow-scripts allow-same-origin" loading="lazy" title="${project.title} preview"></iframe>
+                        ` : `
+                        <img src="${project.image_url || 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22280%22><rect fill=%22%233C1B69%22 width=%22400%22 height=%22280%22/><text x=%22200%22 y=%22140%22 text-anchor=%22middle%22 fill=%22white%22 font-size=%2240%22 font-family=%22serif%22>SAK</text></svg>'}"
+                             alt="${project.title}"
+                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                             onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22280%22><rect fill=%22%233C1B69%22 width=%22400%22 height=%22280%22/><text x=%22200%22 y=%22140%22 text-anchor=%22middle%22 fill=%22white%22 font-size=%2240%22 font-family=%22serif%22>SAK</text></svg>'">
+                        `}
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="px-2.5 py-1 bg-primary/10 text-primary rounded-md text-xs font-medium">${getCategoryLabel(project)}</span>
+                            ${project.is_featured ? '<span class="px-2.5 py-1 bg-gold/20 text-gold-dark rounded-md text-xs font-medium">Featured</span>' : ''}
+                        </div>
+                        <h3 class="font-heading text-xl font-bold text-gray-900 mb-3 group-hover:text-primary transition">${project.title}</h3>
+                        <p class="text-gray-600 text-sm mb-4 line-clamp-3">${project.description}</p>
+                        <div class="flex flex-wrap gap-2">
+                            ${(project.technologies || '').split(',').map(tech => `
+                                <span class="px-3 py-1 bg-accent/50 text-primary rounded-full text-xs font-medium">${tech.trim()}</span>
+                            `).join('')}
+                        </div>
+                        ${project.project_url ? `
+                        <a href="${project.project_url.match(/^https?:\/\//) ? project.project_url : 'https://' + project.project_url}" target="_blank" class="inline-flex items-center gap-1.5 mt-4 text-primary text-sm font-medium hover:underline">
+                            <span class="material-symbols-outlined text-base">open_in_new</span> View Live Prototype
+                        </a>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+
+            // Trigger fade-in
+            setTimeout(() => {
+                document.querySelectorAll('.fade-in').forEach(el => el.classList.add('visible'));
+            }, 100);
+        }
+
+        function getProjectCategory(project) {
+            const tech = (project.technologies || '').toLowerCase();
+            const desc = (project.description || '').toLowerCase();
+            const title = (project.title || '').toLowerCase();
+            if (tech.includes('react') || tech.includes('node') || tech.includes('html') || tech.includes('tailwind')) return 'web';
+            if (desc.includes('curriculum') || desc.includes('educational') || title.includes('academy')) return 'education';
+            if (desc.includes('textbook') || desc.includes('authored')) return 'writing';
+            return 'design';
+        }
+
+        function getCategoryLabel(project) {
+            const cat = getProjectCategory(project);
+            const labels = { web: 'Web Development', education: 'Education', writing: 'Writing & Content', design: 'Design' };
+            return labels[cat] || 'Project';
+        }
+
+        function loadDefaultProjects() {
+            allProjects = [
+                { id: 1, title: 'Al Mustafa Academy Website', description: 'Designed and developed a modern website for an Islamic academy featuring admissions, curriculum, branding, Arabic content, and a professional user experience.', technologies: 'React, Node.js, Tailwind CSS, Responsive Design', image_url: '', project_url: '', is_featured: 1 },
+                { id: 2, title: 'Arabic Sarf Textbook', description: 'Authored a beginner-friendly Arabic morphology textbook for Idadiyyah students, focusing on simplified explanations, organized lessons, and practical examples.', technologies: 'Content Development, Arabic Language', image_url: '', project_url: '', is_featured: 0 },
+                { id: 3, title: 'Islamic Curriculum Development', description: 'Designed structured educational content for Islamic schools integrating Qur\'anic studies, Arabic language, character development, and modern educational standards.', technologies: 'Curriculum Design, Islamic Studies, Education', image_url: '', project_url: '', is_featured: 1 },
+                { id: 4, title: 'Arabic Educational Resources', description: 'Produced educational materials covering Arabic grammar, morphology, classroom resources, and student learning guides.', technologies: 'Content Development, Arabic Grammar', image_url: '', project_url: '', is_featured: 0 }
+            ];
+            renderProjects();
+        }
+
+        // Scroll progress
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const scrollPercent = (scrollTop / docHeight) * 100;
+            document.getElementById('scroll-progress').style.width = scrollPercent + '%';
+        });
+
+        // Fade in on scroll
+        function handleFadeIn() {
+            document.querySelectorAll('.fade-in').forEach(el => {
+                const elementTop = el.getBoundingClientRect().top;
+                if (elementTop < window.innerHeight - 150) el.classList.add('visible');
+            });
+        }
+        window.addEventListener('scroll', handleFadeIn);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProjects();
+            handleFadeIn();
+        });
+    </script>
+    <script src="/editor.js"></script>
+</body>
+</html>

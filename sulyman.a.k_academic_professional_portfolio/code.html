@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+
+<html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sulyman.A.K - Portfolio</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed-variant": "#574500",
+                        "on-tertiary-fixed-variant": "#51462a",
+                        "surface-container-highest": "#6B44B8",
+                        "secondary-fixed": "#ffe088",
+                        "error-container": "#ffdad6",
+                        "error": "#ba1a1a",
+                        "surface-container-high": "#5A349F",
+                        "on-tertiary": "#ffffff",
+                        "primary-container": "#4A2382",
+                        "primary": "#C9A227",
+                        "tertiary-fixed": "#f2e1bb",
+                        "on-error-container": "#93000a",
+                        "on-primary-fixed": "#002115",
+                        "inverse-primary": "#E4C65B",
+                        "on-primary-fixed-variant": "#005139",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed": "#241a00",
+                        "primary-fixed": "#E4C65B",
+                        "background": "#3C1B69",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-fixed": "#231b04",
+                        "surface": "#3C1B69",
+                        "inverse-on-surface": "#eaf1ff",
+                        "surface-container": "#402070",
+                        "outline": "#A98FD4",
+                        "primary-fixed-dim": "#C9A227",
+                        "on-secondary-container": "#745c00",
+                        "inverse-surface": "#27313f",
+                        "on-background": "#EDE4F7",
+                        "surface-bright": "#4E2B8F",
+                        "on-secondary": "#ffffff",
+                        "secondary-container": "#fed65b",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-low": "#35175F",
+                        "on-tertiary-container": "#ebdab5",
+                        "on-primary-container": "#EDE4F7",
+                        "surface-variant": "#C6CEC8",
+                        "tertiary": "#53482c",
+                        "secondary-fixed-dim": "#e9c349",
+                        "outline-variant": "#8A75A8",
+                        "surface-dim": "#2A1350",
+                        "secondary": "#735c00",
+                        "surface-tint": "#056c4d",
+                        "tertiary-container": "#6b5f42",
+                        "on-surface-variant": "#CBBBE0",
+                        "tertiary-fixed-dim": "#d5c5a1",
+                        "on-surface": "#EDE4F7",
+                        "gold": "#D4AF37",
+                        "warm-beige": "#EAD9B4"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "container-max": "1200px",
+                        "gutter": "24px",
+                        "section-padding-mobile": "64px",
+                        "base": "8px",
+                        "section-padding-desktop": "120px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Playfair Display"],
+                        "display-lg": ["Playfair Display"],
+                        "body-lg": ["Inter"],
+                        "display-lg-mobile": ["Playfair Display"],
+                        "headline-md": ["Playfair Display"],
+                        "body-md": ["Inter"],
+                        "label-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "display-lg": ["56px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "1.7", "fontWeight": "400" }],
+                        "display-lg-mobile": ["40px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .geometric-bg {
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%230b6e4f' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        .typing-effect {
+            border-right: 2px solid #00543b;
+            white-space: nowrap;
+            overflow: hidden;
+            animation: typing 3s steps(40, end), blink-caret .75s step-end infinite;
+        }
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: #00543b; }
+        }
+        
+        .btn-gold {
+            background-color: #D4AF37;
+            color: #ffffff;
+            transition: all 0.3s ease;
+        }
+        .btn-gold:hover {
+            background-color: #b5952f;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(212, 175, 55, 0.2);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            color: #00543b;
+            border: 1px solid #00543b;
+            transition: all 0.3s ease;
+        }
+        .btn-outline:hover {
+            background-color: #EAD9B4;
+            border-color: #EAD9B4;
+        }
+
+        .btn-primary {
+            background-color: #00543b;
+            color: #ffffff;
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+        .btn-primary:hover {
+            background-color: #003a29;
+            border-bottom: 2px solid #D4AF37;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid #EAD9B4;
+        }
+
+        .hover-gold-underline {
+            position: relative;
+        }
+        .hover-gold-underline::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 50%;
+            background-color: #D4AF37;
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+        .hover-gold-underline:hover::after, .hover-gold-underline.active::after {
+            width: 100%;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md antialiased selection:bg-secondary-container selection:text-on-secondary-container geometric-bg min-h-screen flex flex-col relative">
+<!-- TopAppBar (Web) -->
+<header class="fixed top-0 w-full z-50 bg-surface/70 dark:bg-surface-container-highest/70 backdrop-blur-md shadow-sm dark:shadow-none hidden md:block transition-all duration-300 ease-in-out">
+<div class="flex justify-between items-center px-gutter py-4 max-w-container-max mx-auto">
+<div class="flex items-center gap-4">
+<img alt="SAK Logo" class="h-10 w-10 object-contain rounded-DEFAULT" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAdq2PZPiYTLnyf7y7Fa_mJM7PRa4YoFin0Cx39bfSsaoQDSG4DfahT6t_fS8R5OOdkG35B8d5dWfftFvUlwN0kBDEqNOEmLR8fJhvjfGMmEYBA2zbgltnZbLJ_kOi0YOelBNSTNFRdVyHdlnq3e15gS0Y2T6iZPo66RXTI3zimJXNL6tzJSx9tuSgB_raIdGPz-RnE37WhTXvyy9FmUZ3OK-UtrbgIlczVoUlyPc6NwBqmVhpvOV19"/>
+<span class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed tracking-tight">Sulyman.A.K</span>
+</div>
+<nav class="flex gap-8 items-center">
+<a class="font-label-md text-label-md text-primary dark:text-primary-fixed hover-gold-underline active pb-1 transition-colors duration-300" href="#">Home</a>
+<a class="font-label-md text-label-md text-on-surface-variant dark:text-on-surface-variant hover-gold-underline pb-1 transition-colors duration-300 hover:text-primary" href="#">About</a>
+<a class="font-label-md text-label-md text-on-surface-variant dark:text-on-surface-variant hover-gold-underline pb-1 transition-colors duration-300 hover:text-primary" href="#">Work</a>
+<a class="font-label-md text-label-md text-on-surface-variant dark:text-on-surface-variant hover-gold-underline pb-1 transition-colors duration-300 hover:text-primary" href="#">Skill</a>
+<a class="font-label-md text-label-md text-on-surface-variant dark:text-on-surface-variant hover-gold-underline pb-1 transition-colors duration-300 hover:text-primary" href="#">Expert</a>
+</nav>
+<button class="btn-primary font-label-md text-label-md px-6 py-2 rounded-DEFAULT flex items-center gap-2">
+                Contact Me
+                <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-grow pt-24 md:pt-32 pb-section-padding-mobile md:pb-section-padding-desktop px-gutter max-w-container-max mx-auto w-full flex flex-col justify-center min-h-screen">
+<!-- Hero Section -->
+<section class="grid grid-cols-1 md:grid-cols-12 gap-gutter items-center">
+<div class="md:col-span-8 flex flex-col gap-6 relative z-10">
+<div class="inline-flex items-center gap-2 bg-surface-container-low px-4 py-2 rounded-full w-fit border border-warm-beige">
+<span class="material-symbols-outlined text-primary text-[18px]">menu_book</span>
+<span class="font-label-md text-label-md text-primary">Educator &amp; Designer</span>
+</div>
+<h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-on-background">
+                    Bridging Islamic Scholarship, <br class="hidden md:block"/> Arabic Excellence, and <br class="hidden md:block"/> <span class="text-primary relative inline-block">Modern Educational Innovation.<svg class="absolute w-full h-3 -bottom-1 left-0 text-secondary-container" preserveaspectratio="none" viewbox="0 0 100 10"><path d="M0 5 Q 50 10 100 5" fill="none" stroke="currentColor" stroke-width="4"></path></svg></span>
+</h1>
+<div class="h-8 md:h-10 mt-2">
+<p class="font-body-lg text-body-lg text-on-surface-variant typing-effect inline-block pr-2">
+                        I blend traditional rigor with digital craftsmanship.
+                    </p>
+</div>
+<div class="flex flex-wrap gap-4 mt-8">
+<button class="btn-gold font-label-md text-label-md px-8 py-3 rounded-DEFAULT shadow-md flex items-center gap-2">
+                        View Projects
+                        <span class="material-symbols-outlined text-[18px]">arrow_right_alt</span>
+</button>
+<button class="btn-outline font-label-md text-label-md px-8 py-3 rounded-DEFAULT flex items-center gap-2">
+                        Download CV
+                        <span class="material-symbols-outlined text-[18px]">download</span>
+</button>
+</div>
+<div class="mt-12 flex items-center gap-6 text-on-surface-variant font-label-md text-label-md">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">verified</span>
+<span>10+ Years Experience</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">school</span>
+<span>Islamic Sciences</span>
+</div>
+</div>
+</div>
+<!-- Decorative Element for Desktop -->
+<div class="hidden md:flex md:col-span-4 justify-center items-center relative h-[400px]">
+<div class="absolute inset-0 bg-primary/5 rounded-full blur-3xl mix-blend-multiply"></div>
+<div class="glass-panel w-full h-[300px] rounded-xl flex items-center justify-center p-8 relative z-10 transform rotate-3 hover:rotate-0 transition-transform duration-500 shadow-[0_4px_20px_rgba(0,84,59,0.04)]">
+<div class="text-center">
+<span class="material-symbols-outlined text-[64px] text-primary mb-4 block" style="font-variation-settings: 'FILL' 1;">architecture</span>
+<h3 class="font-headline-md text-headline-md text-on-background mb-2">Digital Mastery</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Synthesizing academic rigor with modern web design.</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar (Mobile) -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center p-2 pb-safe bg-surface dark:bg-surface-dim shadow-[0_-4px_10px_rgba(0,0,0,0.05)] block md:hidden z-50">
+<a class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-4 py-1 scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-md text-label-md mt-1 text-[10px]">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high rounded-full px-4 py-1 scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined text-[24px]">person</span>
+<span class="font-label-md text-label-md mt-1 text-[10px]">About</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high rounded-full px-4 py-1 scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined text-[24px]">work</span>
+<span class="font-label-md text-label-md mt-1 text-[10px]">Work</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high rounded-full px-4 py-1 scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined text-[24px]">terminal</span>
+<span class="font-label-md text-label-md mt-1 text-[10px]">Skill</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high rounded-full px-4 py-1 scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined text-[24px]">school</span>
+<span class="font-label-md text-label-md mt-1 text-[10px]">Expert</span>
+</a>
+</nav>
+<!-- Footer -->
+<footer class="w-full py-section-padding-mobile md:py-16 bg-surface-container-low dark:bg-surface-container-lowest border-t border-secondary-fixed mt-auto mb-16 md:mb-0">
+<div class="flex flex-col md:flex-row justify-between items-center px-gutter max-w-container-max mx-auto gap-8">
+<div class="font-headline-md text-headline-md text-primary font-bold">
+                Sulyman.A.K
+            </div>
+<nav class="flex flex-wrap justify-center gap-6">
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary transition-colors opacity-80 hover:opacity-100" href="#">Philosophy</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary transition-colors opacity-80 hover:opacity-100" href="#">Services</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary transition-colors opacity-80 hover:opacity-100" href="#">Experience</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-secondary transition-colors opacity-80 hover:opacity-100" href="#">Contact</a>
+</nav>
+<div class="font-body-md text-body-md text-on-surface-variant text-sm">
+                © 2024 Sulyman Abdulrafiu Kehinde. All rights reserved.
+            </div>
+</div>
+</footer>
+<script>
+        // Optional: Simple vanilla JS for active state management if needed dynamically
+        document.addEventListener('DOMContentLoaded', () => {
+            const typingText = document.querySelector('.typing-effect');
+            if(typingText) {
+                // Keep the typing text within bounds to avoid layout shifts
+                typingText.style.display = 'inline-block';
+            }
+        });
+    </script>
+</body></html>
