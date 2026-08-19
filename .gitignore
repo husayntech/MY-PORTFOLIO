@@ -2,6 +2,3 @@ node_modules/
 data/portfolio.db
 .env
 *.log
-
-.vercel
-.env*
